@@ -16,45 +16,56 @@
                 <input asp-for="UnitNumber" class="form-control" />
                 <span asp-validation-for="UnitNumber" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="PropertyType" class="control-label"></label>
-                <input asp-for="PropertyType" class="form-control" />
+                <select asp-for="PropertyType" class="form-control">
+                    <option value="">-- Select Type --</option>
+                    <option value="Residential">Residential</option>
+                    <option value="Commercial">Commercial</option>
+                </select>
                 <span asp-validation-for="PropertyType" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="FloorLevel" class="control-label"></label>
                 <input asp-for="FloorLevel" class="form-control" />
                 <span asp-validation-for="FloorLevel" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="AreaSqFt" class="control-label"></label>
                 <input asp-for="AreaSqFt" class="form-control" />
                 <span asp-validation-for="AreaSqFt" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="Amenities" class="control-label"></label>
-                <input asp-for="Amenities" class="form-control" />
+                <textarea asp-for="Amenities" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Amenities" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="Status" class="control-label"></label>
                 <select asp-for="Status" class="form-control">
                     <option value="Vacant">Vacant</option>
                     <option value="Occupied">Occupied</option>
-                    <option value="Under Maintenance">Under Maintenance</option>
                 </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="AskingRent" class="control-label"></label>
                 <input asp-for="AskingRent" class="form-control" />
                 <span asp-validation-for="AskingRent" class="text-danger"></span>
             </div>
+
             <div class="form-group mb-3">
                 <label asp-for="VacantSince" class="control-label"></label>
                 <input asp-for="VacantSince" class="form-control" type="date" />
                 <span asp-validation-for="VacantSince" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
