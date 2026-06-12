@@ -19,15 +19,15 @@ public class TenantsController : Controller
     }
 
     // GET: TENANTS/Details/5
-    public async Task<IActionResult> Details(int? tenantid)
+    public async Task<IActionResult> Details(int? id)
     {
-        if (tenantid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
         var tenant = await _context.Tenants
-            .FirstOrDefaultAsync(m => m.TenantID == tenantid);
+            .FirstOrDefaultAsync(m => m.TenantID == id);
         if (tenant == null)
         {
             return NotFound();
@@ -59,14 +59,14 @@ public class TenantsController : Controller
     }
 
     // GET: TENANTS/Edit/5
-    public async Task<IActionResult> Edit(int? tenantid)
+    public async Task<IActionResult> Edit(int? id)
     {
-        if (tenantid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
-        var tenant = await _context.Tenants.FindAsync(tenantid);
+        var tenant = await _context.Tenants.FindAsync(id);
         if (tenant == null)
         {
             return NotFound();
@@ -79,9 +79,9 @@ public class TenantsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? tenantid, [Bind("TenantID,FullName,CNIC,Email,ContactNumber,EmergencyContact,Status")] Tenant tenant)
+    public async Task<IActionResult> Edit(int id, [Bind("TenantID,FullName,CNIC,Email,ContactNumber,EmergencyContact,Status")] Tenant tenant)
     {
-        if (tenantid != tenant.TenantID)
+        if (id != tenant.TenantID)
         {
             return NotFound();
         }
@@ -110,15 +110,15 @@ public class TenantsController : Controller
     }
 
     // GET: TENANTS/Delete/5
-    public async Task<IActionResult> Delete(int? tenantid)
+    public async Task<IActionResult> Delete(int? id)
     {
-        if (tenantid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
         var tenant = await _context.Tenants
-            .FirstOrDefaultAsync(m => m.TenantID == tenantid);
+            .FirstOrDefaultAsync(m => m.TenantID == id);
         if (tenant == null)
         {
             return NotFound();
@@ -130,9 +130,9 @@ public class TenantsController : Controller
     // POST: TENANTS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? tenantid)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var tenant = await _context.Tenants.FindAsync(tenantid);
+        var tenant = await _context.Tenants.FindAsync(id);
         if (tenant != null)
         {
             _context.Tenants.Remove(tenant);
@@ -142,8 +142,8 @@ public class TenantsController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private bool TenantExists(int? tenantid)
+    private bool TenantExists(int id)
     {
-        return _context.Tenants.Any(e => e.TenantID == tenantid);
+        return _context.Tenants.Any(e => e.TenantID == id);
     }
 }

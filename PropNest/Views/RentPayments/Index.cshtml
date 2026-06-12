@@ -1,0 +1,42 @@
+@model IEnumerable<PropNest.Models.RentPayment>
+
+@{
+    ViewData["Title"] = "Rent Payments";
+}
+
+<h1>Rent Payments</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ Record Payment</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Lease ID</th>
+            <th>Due Date</th>
+            <th>Payment Date</th>
+            <th>Amount Paid</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.LeaseID</td>
+                <td>@item.DueDate.ToShortDateString()</td>
+                <td>@(item.PaymentDate.HasValue ? item.PaymentDate.Value.ToShortDateString() : "-")</td>
+                <td>@item.AmountPaid</td>
+                <td>@(item.PaymentMethod ?? "-")</td>
+                <td>@item.Status</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PaymentID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.PaymentID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.PaymentID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

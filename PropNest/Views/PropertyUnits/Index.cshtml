@@ -1,0 +1,46 @@
+@model IEnumerable<PropNest.Models.PropertyUnit>
+
+@{
+    ViewData["Title"] = "Properties";
+}
+
+<h1>Properties</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ Add Property</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Unit Number</th>
+            <th>Type</th>
+            <th>Floor</th>
+            <th>Area (sqft)</th>
+            <th>Amenities</th>
+            <th>Status</th>
+            <th>Asking Rent</th>
+            <th>Vacant Since</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(model => item.UnitNumber)</td>
+                <td>@Html.DisplayFor(model => item.PropertyType)</td>
+                <td>@Html.DisplayFor(model => item.FloorLevel)</td>
+                <td>@Html.DisplayFor(model => item.AreaSqFt)</td>
+                <td>@Html.DisplayFor(model => item.Amenities)</td>
+                <td>@Html.DisplayFor(model => item.Status)</td>
+                <td>@Html.DisplayFor(model => item.AskingRent)</td>
+                <td>@(item.VacantSince.HasValue ? item.VacantSince.Value.ToShortDateString() : "-")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.UnitID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.UnitID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.UnitID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

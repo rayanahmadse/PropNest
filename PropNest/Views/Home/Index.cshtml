@@ -1,8 +1,67 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4 mb-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4" style="font-weight: 700; letter-spacing: -0.04em;">Dashboard</h1>
+        <p class="lead text-muted" style="font-size: 1.2rem;">Welcome to the PropNest Management System</p>
+    </div>
+    
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Tenants</h5>
+                    <p class="card-text text-muted mb-4">Manage tenant information and profiles.</p>
+                    <a asp-controller="Tenants" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Tenants</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Properties</h5>
+                    <p class="card-text text-muted mb-4">Manage property units and details.</p>
+                    <a asp-controller="PropertyUnits" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Properties</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Leases</h5>
+                    <p class="card-text text-muted mb-4">Manage lease contracts and terms.</p>
+                    <a asp-controller="LeaseContracts" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Leases</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Payments</h5>
+                    <p class="card-text text-muted mb-4">Track and manage rent payments.</p>
+                    <a asp-controller="RentPayments" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Payments</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Staff</h5>
+                    <p class="card-text text-muted mb-4">Manage staff members and roles.</p>
+                    <a asp-controller="Staff" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Staff</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="apple-card h-100 p-4">
+                <div class="card-body text-center d-flex flex-column">
+                    <h5 class="card-title fs-4">Maintenance</h5>
+                    <p class="card-text text-muted mb-4">Handle maintenance requests and status.</p>
+                    <a asp-controller="MaintenanceRequests" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Maintenance</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

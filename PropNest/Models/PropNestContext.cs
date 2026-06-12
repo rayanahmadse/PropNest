@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace PropNest.Models
 {
@@ -25,6 +25,8 @@ namespace PropNest.Models
             // PropertyUnit
             modelBuilder.Entity<PropertyUnit>().ToTable("PropertyUnit");
             modelBuilder.Entity<PropertyUnit>().HasKey(p => p.UnitID);
+            modelBuilder.Entity<PropertyUnit>().Property(p => p.AreaSqFt).HasPrecision(18, 2);
+            modelBuilder.Entity<PropertyUnit>().Property(p => p.AskingRent).HasPrecision(18, 2);
 
             // Staff
             modelBuilder.Entity<Staff>().ToTable("Staff");
@@ -33,6 +35,8 @@ namespace PropNest.Models
             // LeaseContract
             modelBuilder.Entity<LeaseContract>().ToTable("LeaseContract");
             modelBuilder.Entity<LeaseContract>().HasKey(l => l.LeaseID);
+            modelBuilder.Entity<LeaseContract>().Property(l => l.MonthlyRent).HasPrecision(18, 2);
+            modelBuilder.Entity<LeaseContract>().Property(l => l.SecurityDeposit).HasPrecision(18, 2);
             modelBuilder.Entity<LeaseContract>()
                 .HasOne(l => l.Tenant)
                 .WithMany()
@@ -45,6 +49,7 @@ namespace PropNest.Models
             // RentPayment
             modelBuilder.Entity<RentPayment>().ToTable("RentPayment");
             modelBuilder.Entity<RentPayment>().HasKey(r => r.PaymentID);
+            modelBuilder.Entity<RentPayment>().Property(r => r.AmountPaid).HasPrecision(18, 2);
             modelBuilder.Entity<RentPayment>()
                 .HasOne(r => r.LeaseContract)
                 .WithMany()

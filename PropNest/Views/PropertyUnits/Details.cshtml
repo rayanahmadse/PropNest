@@ -1,0 +1,31 @@
+@model PropNest.Models.PropertyUnit
+
+@{
+    ViewData["Title"] = "Property Details";
+}
+
+<h1>Property Details</h1>
+<hr />
+<dl class="row">
+    <dt class="col-sm-3">Unit Number</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.UnitNumber)</dd>
+    <dt class="col-sm-3">Type</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.PropertyType)</dd>
+    <dt class="col-sm-3">Floor Level</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.FloorLevel)</dd>
+    <dt class="col-sm-3">Area (sqft)</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.AreaSqFt)</dd>
+    <dt class="col-sm-3">Amenities</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.Amenities)</dd>
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+    <dt class="col-sm-3">Asking Rent</dt>
+    <dd class="col-sm-9">@Html.DisplayFor(model => model.AskingRent)</dd>
+    <dt class="col-sm-3">Vacant Since</dt>
+    <dd class="col-sm-9">@(Model.VacantSince.HasValue ? Model.VacantSince.Value.ToShortDateString() : "-")</dd>
+</dl>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.UnitID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

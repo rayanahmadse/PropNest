@@ -1,0 +1,46 @@
+@model IEnumerable<PropNest.Models.LeaseContract>
+
+@{
+    ViewData["Title"] = "Lease Contracts";
+}
+
+<h1>Lease Contracts</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ New Lease</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tenant</th>
+            <th>Unit</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Monthly Rent</th>
+            <th>Security Deposit</th>
+            <th>Status</th>
+            <th>Version</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@(item.Tenant?.FullName ?? "-")</td>
+                <td>@(item.PropertyUnit?.UnitNumber ?? "-")</td>
+                <td>@item.StartDate.ToShortDateString()</td>
+                <td>@item.EndDate.ToShortDateString()</td>
+                <td>@item.MonthlyRent</td>
+                <td>@(item.SecurityDeposit.HasValue ? item.SecurityDeposit.Value.ToString() : "-")</td>
+                <td>@item.LeaseStatus</td>
+                <td>@item.Version</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.LeaseID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.LeaseID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.LeaseID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,68 @@
+@model PropNest.Models.LeaseContract
+
+@{
+    ViewData["Title"] = "Edit Lease Contract";
+}
+
+<h1>Edit Lease Contract</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="LeaseID" />
+
+            <div class="form-group mb-3">
+                <label asp-for="TenantID" class="control-label">Tenant</label>
+                <select asp-for="TenantID" class="form-control" asp-items="ViewBag.TenantID"></select>
+                <span asp-validation-for="TenantID" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="UnitID" class="control-label">Property Unit</label>
+                <select asp-for="UnitID" class="form-control" asp-items="ViewBag.UnitID"></select>
+                <span asp-validation-for="UnitID" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="MonthlyRent" class="control-label"></label>
+                <input asp-for="MonthlyRent" class="form-control" />
+                <span asp-validation-for="MonthlyRent" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="SecurityDeposit" class="control-label"></label>
+                <input asp-for="SecurityDeposit" class="form-control" />
+                <span asp-validation-for="SecurityDeposit" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="LeaseStatus" class="control-label"></label>
+                <select asp-for="LeaseStatus" class="form-control">
+                    <option value="Active">Active</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Terminated">Terminated</option>
+                </select>
+                <span asp-validation-for="LeaseStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Version" class="control-label"></label>
+                <input asp-for="Version" class="form-control" />
+                <span asp-validation-for="Version" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index">Back to List</a>
+</div>
