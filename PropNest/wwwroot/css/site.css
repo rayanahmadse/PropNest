@@ -205,7 +205,7 @@ a:hover {
 }
 
 /* "Create New" link wrapper */
-p > a {
+.create-new-link > a {
   display: inline-block;
   background-color: var(--apple-blue);
   color: white !important;

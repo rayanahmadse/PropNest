@@ -48,10 +48,11 @@ namespace PropNest.Controllers
         // POST: LeaseContracts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TenantID,UnitID,StartDate,EndDate,MonthlyRent,SecurityDeposit,LeaseStatus,Version")] LeaseContract lease)
+        public async Task<IActionResult> Create([Bind("TenantID,UnitID,StartDate,EndDate,MonthlyRent,SecurityDeposit,LeaseStatus")] LeaseContract lease)
         {
             if (ModelState.IsValid)
             {
+                lease.Version = 1;
                 _context.Add(lease);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -77,7 +78,7 @@ namespace PropNest.Controllers
         // POST: LeaseContracts/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("LeaseID,TenantID,UnitID,StartDate,EndDate,MonthlyRent,SecurityDeposit,LeaseStatus,Version")] LeaseContract lease)
+        public async Task<IActionResult> Edit(int id, [Bind("LeaseID,TenantID,UnitID,StartDate,EndDate,MonthlyRent,SecurityDeposit,LeaseStatus")] LeaseContract lease)
         {
             if (id != lease.LeaseID) return NotFound();
 
@@ -85,7 +86,18 @@ namespace PropNest.Controllers
             {
                 try
                 {
-                    _context.Update(lease);
+                    var existingLease = await _context.LeaseContracts.FindAsync(id);
+                    if (existingLease == null) return NotFound();
+
+                    existingLease.TenantID = lease.TenantID;
+                    existingLease.UnitID = lease.UnitID;
+                    existingLease.StartDate = lease.StartDate;
+                    existingLease.EndDate = lease.EndDate;
+                    existingLease.MonthlyRent = lease.MonthlyRent;
+                    existingLease.SecurityDeposit = lease.SecurityDeposit;
+                    existingLease.LeaseStatus = lease.LeaseStatus;
+
+                    _context.Update(existingLease);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
