@@ -4,116 +4,146 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<!-- Page Header -->
-<div class="page-header mb-5">
+<style>
+    .dashboard-header {
+        margin-bottom: 48px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .dashboard-header h1 {
+        margin-bottom: 8px;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin-bottom: 56px;
+    }
+
+    .quick-access-section h2 {
+        margin-bottom: 28px;
+        font-size: 1.5rem;
+    }
+
+    .quick-access-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+    }
+
+    .quick-access-card {
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 28px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-decoration: none !important;
+        color: inherit !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .quick-access-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        border-color: var(--color-blue);
+    }
+
+    .quick-access-card h4 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--color-text);
+    }
+
+    .quick-access-card p {
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        margin: 0;
+        line-height: 1.5;
+    }
+</style>
+
+<!-- Header -->
+<div class="dashboard-header">
     <h1>Dashboard</h1>
-    <p>Overview of your property management activity</p>
+    <p style="color: var(--color-text-muted); margin: 0;">Overview of your property management system</p>
 </div>
 
-<!-- Key Metrics Grid -->
-<div class="row mb-5">
+<!-- Key Metrics -->
+<div class="metrics-grid">
     <!-- Rent Collected -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
-            <div class="metric-card">
-                <div class="metric-label">Rent Collected</div>
-                <div class="metric-value">@Model.TotalRentCollectedThisMonth.ToString("C0")</div>
-                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">This month</p>
-            </div>
-        </a>
-    </div>
+    <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
+        <div class="metric-card">
+            <div class="metric-label">Rent Collected</div>
+            <div class="metric-value">@Model.TotalRentCollectedThisMonth.ToString("C0")</div>
+            <div class="metric-subtitle">This month</div>
+        </div>
+    </a>
 
     <!-- Vacant Units -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="@Url.Action("Index", "PropertyUnits")" style="text-decoration: none; color: inherit;">
-            <div class="metric-card">
-                <div class="metric-label">Vacant Units</div>
-                <div class="metric-value">@Model.VacantUnitsCount</div>
-                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">Available</p>
-            </div>
-        </a>
-    </div>
+    <a href="@Url.Action("Index", "PropertyUnits")" style="text-decoration: none; color: inherit;">
+        <div class="metric-card">
+            <div class="metric-label">Vacant Units</div>
+            <div class="metric-value">@Model.VacantUnitsCount</div>
+            <div class="metric-subtitle">Available</div>
+        </div>
+    </a>
 
     <!-- Overdue Payments -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
-            <div class="metric-card">
-                <div class="metric-label">Overdue Payments</div>
-                <div class="metric-value" style="color: var(--color-red);">@Model.OverduePaymentsCount</div>
-                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">Need attention</p>
-            </div>
-        </a>
-    </div>
+    <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
+        <div class="metric-card">
+            <div class="metric-label">Overdue Payments</div>
+            <div class="metric-value" style="color: var(--color-red);">@Model.OverduePaymentsCount</div>
+            <div class="metric-subtitle">Need attention</div>
+        </div>
+    </a>
 
     <!-- Expiring Agreements -->
-    <div class="col-12 col-sm-6 col-lg-3">
-        <a href="@Url.Action("Index", "RentalAgreements")" style="text-decoration: none; color: inherit;">
-            <div class="metric-card">
-                <div class="metric-label">Expiring Soon</div>
-                <div class="metric-value">@Model.AgreementsExpiringIn30Days</div>
-                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">In 30 days</p>
-            </div>
-        </a>
-    </div>
+    <a href="@Url.Action("Index", "RentalAgreements")" style="text-decoration: none; color: inherit;">
+        <div class="metric-card">
+            <div class="metric-label">Expiring Soon</div>
+            <div class="metric-value">@Model.AgreementsExpiringIn30Days</div>
+            <div class="metric-subtitle">In 30 days</div>
+        </div>
+    </a>
 </div>
 
-<!-- Quick Navigation -->
-<div class="row">
-    <div class="col-12">
-        <h2 style="margin-bottom: 20px; font-size: 1.3rem; font-weight: 600;">Quick Access</h2>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "Tenants")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Tenants</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">View and manage all tenants</p>
-            </div>
+<!-- Quick Access Section -->
+<div class="quick-access-section">
+    <h2>Quick Access</h2>
+    <div class="quick-access-grid">
+        <a href="@Url.Action("Index", "Tenants")" class="quick-access-card">
+            <h4>Tenants</h4>
+            <p>View and manage all tenants</p>
         </a>
-    </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "PropertyUnits")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Properties</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage your property portfolio</p>
-            </div>
+        <a href="@Url.Action("Index", "PropertyUnits")" class="quick-access-card">
+            <h4>Properties</h4>
+            <p>Manage your property portfolio</p>
         </a>
-    </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "RentalAgreements")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Agreements</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Track rental agreements</p>
-            </div>
+        <a href="@Url.Action("Index", "RentalAgreements")" class="quick-access-card">
+            <h4>Agreements</h4>
+            <p>Track rental agreements</p>
         </a>
-    </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Payments</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage rent payments</p>
-            </div>
+        <a href="@Url.Action("Index", "RentPayments")" class="quick-access-card">
+            <h4>Payments</h4>
+            <p>Manage rent payments</p>
         </a>
-    </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "Staff")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Staff</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage staff members</p>
-            </div>
+        <a href="@Url.Action("Index", "Staff")" class="quick-access-card">
+            <h4>Staff</h4>
+            <p>Manage staff members</p>
         </a>
-    </div>
 
-    <div class="col-12 col-sm-6 col-lg-4">
-        <a href="@Url.Action("Index", "MaintenanceRequests")" style="text-decoration: none; color: inherit;">
-            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
-                <h4 style="margin-bottom: 8px; font-weight: 600;">Maintenance</h4>
-                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Track maintenance requests</p>
-            </div>
+        <a href="@Url.Action("Index", "MaintenanceRequests")" class="quick-access-card">
+            <h4>Maintenance</h4>
+            <p>Track maintenance requests</p>
         </a>
     </div>
 </div>
