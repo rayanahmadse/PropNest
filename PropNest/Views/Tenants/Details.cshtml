@@ -1,59 +1,160 @@
-@model PropNest.Models.Tenant
+@model PropNest.Models.TenantDetailsViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Tenant Details";
 }
 
-<h1>Details</h1>
+<h1>Tenant Details</h1>
 
-<div>
-    <h4>Tenant</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CNIC)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CNIC)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ContactNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ContactNumber)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EmergencyContact)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EmergencyContact)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.TenantID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.Tenant != null)
+{
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">Tenant Profile</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Name</dt>
+                        <dd class="col-sm-7">@Model.Tenant.FullName</dd>
+                        <dt class="col-sm-5">CNIC</dt>
+                        <dd class="col-sm-7">@Model.Tenant.CNIC</dd>
+                        <dt class="col-sm-5">Email</dt>
+                        <dd class="col-sm-7">@Model.Tenant.Email</dd>
+                        <dt class="col-sm-5">Contact</dt>
+                        <dd class="col-sm-7">@Model.Tenant.ContactNumber</dd>
+                        <dt class="col-sm-5">Emergency</dt>
+                        <dd class="col-sm-7">@Model.Tenant.EmergencyContact</dd>
+                        <dt class="col-sm-5">Status</dt>
+                        <dd class="col-sm-7">@Model.Tenant.Status</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Current Agreement</div>
+                <div class="card-body">
+                    @if (Model.ActiveAgreement != null)
+                    {
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">Agreement ID</dt>
+                            <dd class="col-sm-7">@Model.ActiveAgreement.AgreementID</dd>
+                            <dt class="col-sm-5">Unit</dt>
+                            <dd class="col-sm-7">@(Model.ActiveUnit?.UnitNumber ?? "-")</dd>
+                            <dt class="col-sm-5">Status</dt>
+                            <dd class="col-sm-7">@Model.ActiveAgreement.AgreementStatus</dd>
+                            <dt class="col-sm-5">Start</dt>
+                            <dd class="col-sm-7">@Model.ActiveAgreement.StartDate.ToShortDateString()</dd>
+                            <dt class="col-sm-5">End</dt>
+                            <dd class="col-sm-7">@Model.ActiveAgreement.EndDate.ToShortDateString()</dd>
+                            <dt class="col-sm-5">Monthly Rent</dt>
+                            <dd class="col-sm-7">@Model.ActiveAgreement.MonthlyRent.ToString("C")</dd>
+                        </dl>
+                    }
+                    else
+                    {
+                        <span>No active agreement.</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card mb-3">
+                <div class="card-header">All Agreements</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Unit</th>
+                                <th>Status</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Rent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var agreement in Model.Agreements)
+                        {
+                            <tr>
+                                <td>@agreement.AgreementID</td>
+                                <td>@agreement.UnitID</td>
+                                <td>@agreement.AgreementStatus</td>
+                                <td>@agreement.StartDate.ToShortDateString()</td>
+                                <td>@agreement.EndDate.ToShortDateString()</td>
+                                <td>@agreement.MonthlyRent.ToString("C")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Payment History</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Due</th>
+                                <th>Paid</th>
+                                <th>Status</th>
+                                <th>Late Fee</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var payment in Model.RentPayments)
+                        {
+                            <tr>
+                                <td>@payment.PaymentID</td>
+                                <td>@payment.DueDate.ToShortDateString()</td>
+                                <td>@(payment.PaymentDate?.ToShortDateString() ?? "-")</td>
+                                <td>@payment.Status</td>
+                                <td>@payment.LateFeeAmount.ToString("C")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">Maintenance Requests</div>
+                <div class="card-body table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Date Logged</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var request in Model.MaintenanceRequests)
+                        {
+                            <tr>
+                                <td>@request.RequestID</td>
+                                <td>@request.Category</td>
+                                <td>@request.DateLogged.ToShortDateString()</td>
+                                <td>@request.Status</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.Tenant?.TenantID" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>

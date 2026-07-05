@@ -6,6 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddHttpClient();
+
+// Services
+builder.Services.AddScoped<PropNest.Services.MaintenanceRequestService>();
+
 builder.Services.AddDbContext<PropNestContext>(options =>
     options.UseSqlServer(builder.Configuration
     .GetConnectionString("PropNestDb")));

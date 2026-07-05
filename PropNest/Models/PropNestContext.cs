@@ -11,7 +11,7 @@ namespace PropNest.Models
 
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<PropertyUnit> PropertyUnits { get; set; }
-        public DbSet<LeaseContract> LeaseContracts { get; set; }
+        public DbSet<RentalAgreement> RentalAgreements { get; set; }
         public DbSet<RentPayment> RentPayments { get; set; }
         public DbSet<Staff> Staff { get; set; }
         public DbSet<MaintenanceRequest> MaintenanceRequests { get; set; }
@@ -32,16 +32,16 @@ namespace PropNest.Models
             modelBuilder.Entity<Staff>().ToTable("Staff");
             modelBuilder.Entity<Staff>().HasKey(s => s.StaffID);
 
-            // LeaseContract
-            modelBuilder.Entity<LeaseContract>().ToTable("LeaseContract");
-            modelBuilder.Entity<LeaseContract>().HasKey(l => l.LeaseID);
-            modelBuilder.Entity<LeaseContract>().Property(l => l.MonthlyRent).HasPrecision(18, 2);
-            modelBuilder.Entity<LeaseContract>().Property(l => l.SecurityDeposit).HasPrecision(18, 2);
-            modelBuilder.Entity<LeaseContract>()
+            // RentalAgreement
+            modelBuilder.Entity<RentalAgreement>().ToTable("RentalAgreement");
+            modelBuilder.Entity<RentalAgreement>().HasKey(l => l.AgreementID);
+            modelBuilder.Entity<RentalAgreement>().Property(l => l.MonthlyRent).HasPrecision(18, 2);
+            modelBuilder.Entity<RentalAgreement>().Property(l => l.SecurityDeposit).HasPrecision(18, 2);
+            modelBuilder.Entity<RentalAgreement>()
                 .HasOne(l => l.Tenant)
                 .WithMany()
                 .HasForeignKey(l => l.TenantID);
-            modelBuilder.Entity<LeaseContract>()
+            modelBuilder.Entity<RentalAgreement>()
                 .HasOne(l => l.PropertyUnit)
                 .WithMany()
                 .HasForeignKey(l => l.UnitID);
@@ -51,9 +51,9 @@ namespace PropNest.Models
             modelBuilder.Entity<RentPayment>().HasKey(r => r.PaymentID);
             modelBuilder.Entity<RentPayment>().Property(r => r.AmountPaid).HasPrecision(18, 2);
             modelBuilder.Entity<RentPayment>()
-                .HasOne(r => r.LeaseContract)
+                .HasOne(r => r.RentalAgreement)
                 .WithMany()
-                .HasForeignKey(r => r.LeaseID);
+                .HasForeignKey(r => r.AgreementID);
 
             // MaintenanceRequest
             modelBuilder.Entity<MaintenanceRequest>().ToTable("MaintenanceRequest");

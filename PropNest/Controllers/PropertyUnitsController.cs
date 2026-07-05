@@ -1,110 +1,83 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PropNest.Models;
 
 namespace PropNest.Controllers
 {
     public class PropertyUnitsController : Controller
     {
-        private readonly PropNestContext _context;
+        private readonly HttpClient _http;
 
-        public PropertyUnitsController(PropNestContext context)
+        public PropertyUnitsController(IHttpClientFactory factory)
         {
-            _context = context;
+            _http = factory.CreateClient();
+            _http.BaseAddress = new Uri("https://localhost:7120/");
         }
 
-        // GET: PropertyUnits
         public async Task<IActionResult> Index()
         {
-            return View(await _context.PropertyUnits.ToListAsync());
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+            return View(units);
         }
 
-        // GET: PropertyUnits/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
-            var unit = await _context.PropertyUnits.FirstOrDefaultAsync(m => m.UnitID == id);
+            var unit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{id}");
             if (unit == null) return NotFound();
-
             return View(unit);
         }
 
-        // GET: PropertyUnits/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: PropertyUnits/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UnitNumber,PropertyType,FloorLevel,AreaSqFt,Amenities,Status,AskingRent,VacantSince")] PropertyUnit unit)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(unit);
-                await _context.SaveChangesAsync();
+                await _http.PostAsJsonAsync("api/PropertyUnits", unit);
                 return RedirectToAction(nameof(Index));
             }
             return View(unit);
         }
 
-        // GET: PropertyUnits/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
-            var unit = await _context.PropertyUnits.FindAsync(id);
+            var unit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{id}");
             if (unit == null) return NotFound();
-
             return View(unit);
         }
 
-        // POST: PropertyUnits/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UnitID,UnitNumber,PropertyType,FloorLevel,AreaSqFt,Amenities,Status,AskingRent,VacantSince")] PropertyUnit unit)
         {
             if (id != unit.UnitID) return NotFound();
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(unit);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.PropertyUnits.Any(e => e.UnitID == id)) return NotFound();
-                    else throw;
-                }
+                await _http.PutAsJsonAsync($"api/PropertyUnits/{id}", unit);
                 return RedirectToAction(nameof(Index));
             }
             return View(unit);
         }
 
-        // GET: PropertyUnits/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
-
-            var unit = await _context.PropertyUnits.FirstOrDefaultAsync(m => m.UnitID == id);
+            var unit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{id}");
             if (unit == null) return NotFound();
-
             return View(unit);
         }
 
-        // POST: PropertyUnits/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var unit = await _context.PropertyUnits.FindAsync(id);
-            if (unit != null) _context.PropertyUnits.Remove(unit);
-
-            await _context.SaveChangesAsync();
+            await _http.DeleteAsync($"api/PropertyUnits/{id}");
             return RedirectToAction(nameof(Index));
         }
     }

@@ -8,6 +8,7 @@
         public string? Category { get; set; }
         public string? Description { get; set; }
         public DateTime DateLogged { get; set; } = DateTime.Now;
+        public DateTime? DateResolved { get; set; }
         public string Status { get; set; } = "Open";
 
         // Navigation properties

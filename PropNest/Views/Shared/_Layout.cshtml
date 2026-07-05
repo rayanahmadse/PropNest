@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PropNest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PropNest.styles.css" asp-append-version="true" />
@@ -13,7 +13,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm glass-nav mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">PropNest</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span style="font-size: 1.3rem; letter-spacing: -0.02em;">🏠 PropNest</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,30 +23,26 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark fw-500" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="Tenants" asp-action="Index">Tenants</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Tenants" asp-action="Index">Tenants</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="PropertyUnits" asp-action="Index">Properties</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="PropertyUnits" asp-action="Index">Properties</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="RentalAgreements" asp-action="Index">Agreements</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="LeaseContracts" asp-action="Index">Leases</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="RentPayments" asp-action="Index">Payments</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="RentPayments" asp-action="Index">Payments</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="Staff" asp-action="Index">Staff</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Staff" asp-action="Index">Staff</a>
+                            <a class="nav-link text-dark fw-500" asp-controller="MaintenanceRequests" asp-action="Index">Maintenance</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="MaintenanceRequests" asp-action="Index">Maintenance</a>
-                        </li>
-
                     </ul>
                 </div>
             </div>
@@ -56,9 +54,16 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer text-muted mt-5">
         <div class="container">
-            &copy; 2026 - PropNest - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2026 - PropNest Property Management System</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

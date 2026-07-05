@@ -1,27 +1,70 @@
 @model PropNest.Models.RentPayment
 
 @{
-    ViewData["Title"] = "Payment Details";
+    ViewData["Title"] = "Rent Payment Details";
 }
 
-<h1>Payment Details</h1>
+<h1>Rent Payment Details</h1>
 <hr />
-<dl class="row">
-    <dt class="col-sm-3">Lease ID</dt>
-    <dd class="col-sm-9">@Model.LeaseID</dd>
-    <dt class="col-sm-3">Due Date</dt>
-    <dd class="col-sm-9">@Model.DueDate.ToShortDateString()</dd>
-    <dt class="col-sm-3">Payment Date</dt>
-    <dd class="col-sm-9">@(Model.PaymentDate.HasValue ? Model.PaymentDate.Value.ToShortDateString() : "-")</dd>
-    <dt class="col-sm-3">Amount Paid</dt>
-    <dd class="col-sm-9">@Model.AmountPaid</dd>
-    <dt class="col-sm-3">Method</dt>
-    <dd class="col-sm-9">@(Model.PaymentMethod ?? "-")</dd>
-    <dt class="col-sm-3">Status</dt>
-    <dd class="col-sm-9">@Model.Status</dd>
-</dl>
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-3">Payment ID</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.PaymentID)</dd>
 
+            <dt class="col-sm-3">Rental Agreement</dt>
+            <dd class="col-sm-9">
+                @if (Model.RentalAgreement != null)
+                {
+                    <a asp-controller="RentalAgreements" asp-action="Details" asp-route-id="@Model.RentalAgreement.AgreementID">
+                        Agreement #@Html.DisplayFor(model => model.RentalAgreement.AgreementID)
+                    </a>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Payment Date</dt>
+            <dd class="col-sm-9">
+                @if (Model.PaymentDate.HasValue)
+                {
+                    @Html.DisplayFor(model => model.PaymentDate)
+                }
+                else
+                {
+                    <span>-</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Due Date</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.DueDate)</dd>
+
+            <dt class="col-sm-3">Amount Paid</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.AmountPaid)</dd>
+
+            <dt class="col-sm-3">Late Fee</dt>
+            <dd class="col-sm-9">@Model.LateFeeAmount.ToString("C") @if (Model.LateFeeApplied) { <span class="badge bg-warning text-dark">Applied</span> }</dd>
+
+            <dt class="col-sm-3">Payment Method</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.PaymentMethod)</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
+
+            <dt class="col-sm-3">Reminder</dt>
+            <dd class="col-sm-9">@(Model.ReminderSent ? $"Sent {(Model.ReminderSentAt?.ToShortDateString() ?? "")}" : "Pending")</dd>
+        </dl>
+    </div>
+</div>
 <div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.PaymentID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="GenerateReceipt" method="post" class="d-inline">
+        <input type="hidden" name="id" value="@Model.PaymentID" />
+        <button type="submit" class="btn btn-primary">Generate Receipt</button>
+    </form>
+    <a asp-action="DownloadReceipt" asp-route-id="@Model.PaymentID" class="btn btn-secondary">Download Receipt</a>
+    @if (!Model.ReminderSent)
+    {
+        <a asp-action="MarkReminderSent" asp-route-id="@Model.PaymentID" class="btn btn-info">Send Reminder</a>
+    }
+    <a asp-action="Edit" asp-route-id="@Model.PaymentID" class="btn btn-warning">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Delete" asp-route-id="@Model.PaymentID" class="btn btn-danger">Delete</a>
 </div>

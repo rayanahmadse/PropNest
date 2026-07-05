@@ -1,152 +1,84 @@
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PropNest.Models;
 
 namespace PropNest.Controllers
 {
-public class StaffController : Controller
-{
-    private readonly PropNestContext _context;
-
-    public StaffController(PropNestContext context)
+    public class StaffController : Controller
     {
-        _context = context;
-    }
+        private readonly HttpClient _http;
 
-    // GET: Staff
-    public async Task<IActionResult> Index()
-    {
-        return View(await _context.Staff.ToListAsync());
-    }
-
-    // GET: Staff/Details/5
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id == null)
+        public StaffController(IHttpClientFactory factory)
         {
-            return NotFound();
+            _http = factory.CreateClient();
+            _http.BaseAddress = new Uri("https://localhost:7120/");
         }
 
-        var staff = await _context.Staff
-            .FirstOrDefaultAsync(m => m.StaffID == id);
-        if (staff == null)
+        public async Task<IActionResult> Index()
         {
-            return NotFound();
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+            return View(staff);
         }
 
-        return View(staff);
-    }
-
-    // GET: Staff/Create
-    public IActionResult Create()
-    {
-        return View();
-    }
-
-    // POST: Staff/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("FullName,ContactNumber,Specialty,Status")] Staff staff)
-    {
-        if (ModelState.IsValid)
+        public async Task<IActionResult> Details(int? id)
         {
-            _context.Add(staff);
-            await _context.SaveChangesAsync();
+            if (id == null) return NotFound();
+            var staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{id}");
+            if (staff == null) return NotFound();
+            return View(staff);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("FullName,ContactNumber,Specialty,Status")] Staff staff)
+        {
+            if (ModelState.IsValid)
+            {
+                await _http.PostAsJsonAsync("api/Staff", staff);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(staff);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+            var staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{id}");
+            if (staff == null) return NotFound();
+            return View(staff);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("StaffID,FullName,ContactNumber,Specialty,Status")] Staff staff)
+        {
+            if (id != staff.StaffID) return NotFound();
+            if (ModelState.IsValid)
+            {
+                await _http.PutAsJsonAsync($"api/Staff/{id}", staff);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(staff);
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            var staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{id}");
+            if (staff == null) return NotFound();
+            return View(staff);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _http.DeleteAsync($"api/Staff/{id}");
             return RedirectToAction(nameof(Index));
         }
-        return View(staff);
     }
-
-    // GET: Staff/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var staff = await _context.Staff.FindAsync(id);
-        if (staff == null)
-        {
-            return NotFound();
-        }
-        return View(staff);
-    }
-
-    // POST: Staff/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("StaffID,FullName,ContactNumber,Specialty,Status")] Staff staff)
-    {
-        if (id != staff.StaffID)
-        {
-            return NotFound();
-        }
-
-        if (ModelState.IsValid)
-        {
-            try
-            {
-                _context.Update(staff);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!StaffExists(staff.StaffID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
-        return View(staff);
-    }
-
-    // GET: Staff/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var staff = await _context.Staff
-            .FirstOrDefaultAsync(m => m.StaffID == id);
-        if (staff == null)
-        {
-            return NotFound();
-        }
-
-        return View(staff);
-    }
-
-    // POST: Staff/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var staff = await _context.Staff.FindAsync(id);
-        if (staff != null)
-        {
-            _context.Staff.Remove(staff);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-
-    private bool StaffExists(int id)
-    {
-        return _context.Staff.Any(e => e.StaffID == id);
-    }
-}
 }

@@ -38,6 +38,10 @@
             </div>
 
             <div class="form-group">
+                <div class="alert alert-info">If a similar open request already exists for this unit and category, creation will be blocked.</div>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="DateLogged" class="control-label"></label>
                 <input asp-for="DateLogged" class="form-control" />
                 <span asp-validation-for="DateLogged" class="text-danger"></span>
@@ -47,6 +51,13 @@
                 <label asp-for="Status" class="control-label"></label>
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="true" id="createAndNotify" name="createAndNotify">
+                    <label class="form-check-label" for="createAndNotify">Notify staff on creation</label>
+                </div>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

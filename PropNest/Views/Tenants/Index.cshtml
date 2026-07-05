@@ -1,65 +1,134 @@
 @model IEnumerable<PropNest.Models.Tenant>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Tenants";
 }
 
-<h1>Index</h1>
+<style>
+    .page-title-section {
+        margin-bottom: 2rem;
+    }
 
-<p class="create-new-link">
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CNIC)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ContactNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EmergencyContact)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.CNIC)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.ContactNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.EmergencyContact)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.TenantID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.TenantID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.TenantID">Delete</a>
-            </td>
-        </tr>
+    .btn-group-custom {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+</style>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="mb-1">Tenants</h1>
+    <p class="text-muted">Manage tenant profiles and information</p>
+</div>
+
+<!-- Search and Create Section -->
+<div class="search-filter-bar mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-8">
+            <form method="get" class="w-100">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search">🔍</i>
+                    </span>
+                    <input 
+                        type="text" 
+                        class="form-control border-start-0" 
+                        name="search" 
+                        value="@ViewBag.Search" 
+                        placeholder="Search by name, CNIC, email, or contact..." 
+                        style="padding-left: 0.5rem;"
+                    />
+                </div>
+            </form>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <a asp-action="Index" class="btn btn-outline-secondary flex-grow-1">
+                Clear Filter
+            </a>
+            <a asp-action="Create" class="btn btn-apple flex-grow-1">
+                + New Tenant
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Table Section -->
+@if (Model.Any())
+{
+    <div class="apple-card overflow-auto">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">
+                        <strong>Full Name</strong>
+                    </th>
+                    <th>CNIC</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Emergency Contact</th>
+                    <th>Status</th>
+                    <th class="text-center pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="align-middle">
+                        <td class="ps-4">
+                            <span class="fw-600">@item.FullName</span>
+                        </td>
+                        <td>
+                            <code class="bg-light px-2 py-1 rounded">@item.CNIC</code>
+                        </td>
+                        <td>
+                            <a href="mailto:@item.Email" class="text-decoration-none">@item.Email</a>
+                        </td>
+                        <td>
+                            <a href="tel:@item.ContactNumber" class="text-decoration-none">@item.ContactNumber</a>
+                        </td>
+                        <td>@item.EmergencyContact</td>
+                        <td>
+                            @if (item.Status == "Active")
+                            {
+                                <span class="status-badge status-active">● Active</span>
+                            }
+                            else if (item.Status == "Inactive")
+                            {
+                                <span class="status-badge status-inactive">● Inactive</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@item.Status</span>
+                            }
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-group-custom justify-content-end">
+                                <a asp-action="Details" asp-route-id="@item.TenantID" class="btn btn-sm" title="View Details">
+                                    👁️ View
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.TenantID" class="btn btn-sm" title="Edit">
+                                    ✏️ Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.TenantID" class="btn btn-sm btn-danger" title="Delete">
+                                    🗑️ Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">👥</div>
+        <h4>No Tenants Found</h4>
+        <p>There are currently no tenants in the system. Create your first tenant to get started.</p>
+        <a asp-action="Create" class="btn btn-apple">
+            + Create First Tenant
+        </a>
+    </div>
+}

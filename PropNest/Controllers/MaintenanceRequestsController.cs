@@ -1,188 +1,164 @@
-
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using PropNest.Models;
+using PropNest.Services;
 
 namespace PropNest.Controllers
 {
-public class MaintenanceRequestsController : Controller
-{
-    private readonly PropNestContext _context;
-
-    public MaintenanceRequestsController(PropNestContext context)
+    public class MaintenanceRequestsController : Controller
     {
-        _context = context;
-    }
+        private readonly HttpClient _http;
+        private readonly MaintenanceRequestService _service;
 
-    // GET: MaintenanceRequests
-    public async Task<IActionResult> Index()
-    {
-        var propNestContext = _context.MaintenanceRequests.Include(m => m.PropertyUnit).Include(m => m.Staff);
-        return View(await propNestContext.ToListAsync());
-    }
-
-    // GET: MaintenanceRequests/Details/5
-    public async Task<IActionResult> Details(int? id)
-    {
-        if (id == null)
+        public MaintenanceRequestsController(IHttpClientFactory factory, MaintenanceRequestService service)
         {
-            return NotFound();
+            _http = factory.CreateClient();
+            _http.BaseAddress = new Uri("https://localhost:7120/");
+            _service = service;
         }
 
-        var maintenanceRequest = await _context.MaintenanceRequests
-            .Include(m => m.PropertyUnit)
-            .Include(m => m.Staff)
-            .FirstOrDefaultAsync(m => m.RequestID == id);
-        if (maintenanceRequest == null)
+        public async Task<IActionResult> Index()
         {
-            return NotFound();
-        }
-
-        return View(maintenanceRequest);
-    }
-
-    // GET: MaintenanceRequests/Create
-    public IActionResult Create()
-    {
-        ViewData["UnitID"] = new SelectList(_context.PropertyUnits, "UnitID", "UnitNumber");
-        ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "FullName");
-        return View();
-    }
-
-    // POST: MaintenanceRequests/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("UnitID,StaffID,Category,Description,DateLogged,Status")] MaintenanceRequest maintenanceRequest)
-    {
-        if (ModelState.IsValid)
-        {
-            var unitExists = await _context.PropertyUnits.FindAsync(maintenanceRequest.UnitID);
-            if (unitExists == null)
-            {
-                ModelState.AddModelError("UnitID", "The selected property unit does not exist.");
-            }
-
-            if (maintenanceRequest.StaffID.HasValue)
-            {
-                var staffExists = await _context.Staff.FindAsync(maintenanceRequest.StaffID);
-                if (staffExists == null)
-                {
-                    ModelState.AddModelError("StaffID", "The selected staff member does not exist.");
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
-                ViewData["UnitID"] = new SelectList(_context.PropertyUnits, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
-                ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "FullName", maintenanceRequest.StaffID);
-                return View(maintenanceRequest);
-            }
-
-            _context.Add(maintenanceRequest);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        ViewData["UnitID"] = new SelectList(_context.PropertyUnits, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
-        ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "FullName", maintenanceRequest.StaffID);
-        return View(maintenanceRequest);
-    }
-
-    // GET: MaintenanceRequests/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var maintenanceRequest = await _context.MaintenanceRequests.FindAsync(id);
-        if (maintenanceRequest == null)
-        {
-            return NotFound();
-        }
-        ViewData["UnitID"] = new SelectList(_context.PropertyUnits, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
-        ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "FullName", maintenanceRequest.StaffID);
-        return View(maintenanceRequest);
-    }
-
-    // POST: MaintenanceRequests/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("RequestID,UnitID,StaffID,Category,Description,DateLogged,Status")] MaintenanceRequest maintenanceRequest)
-    {
-        if (id != maintenanceRequest.RequestID)
-        {
-            return NotFound();
-        }
-
-        if (ModelState.IsValid)
-        {
+            // Auto-close old requests before showing the list via injected service
             try
             {
-                _context.Update(maintenanceRequest);
-                await _context.SaveChangesAsync();
+                await _service.AutoCloseOldRequestsAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch
             {
-                if (!MaintenanceRequestExists(maintenanceRequest.RequestID))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                // ignore failures here
             }
+
+            var requests = await _http.GetFromJsonAsync<List<MaintenanceRequest>>("api/MaintenanceRequests");
+            return View(requests);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+            var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
+            if (request == null) return NotFound();
+            return View(request);
+        }
+
+        public async Task<IActionResult> Create()
+        {
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+
+            ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(units, "UnitID", "UnitNumber");
+            ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staff, "StaffID", "FullName");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("UnitID,StaffID,Category,Description,DateLogged,Status")] MaintenanceRequest maintenanceRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                // Prevent duplicate open requests for same unit/category
+                if (!string.IsNullOrEmpty(maintenanceRequest.Category))
+                {
+                    var duplicate = await _service.DuplicateOpenRequestExistsAsync(maintenanceRequest.UnitID, maintenanceRequest.Category);
+                    if (duplicate)
+                    {
+                        ModelState.AddModelError(string.Empty, "A similar open maintenance request already exists for this unit.");
+                        var unitsDup = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+                        var staffDup = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+                        ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(unitsDup, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
+                        ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staffDup, "StaffID", "FullName", maintenanceRequest.StaffID);
+                        return View(maintenanceRequest);
+                    }
+                }
+
+                await _http.PostAsJsonAsync("api/MaintenanceRequests", maintenanceRequest);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+
+            ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(units, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
+            ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staff, "StaffID", "FullName", maintenanceRequest.StaffID);
+            return View(maintenanceRequest);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+            var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
+            if (request == null) return NotFound();
+
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+
+            ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(units, "UnitID", "UnitNumber", request.UnitID);
+            ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staff, "StaffID", "FullName", request.StaffID);
+            return View(request);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("RequestID,UnitID,StaffID,Category,Description,DateLogged,Status")] MaintenanceRequest maintenanceRequest)
+        {
+            if (id != maintenanceRequest.RequestID) return NotFound();
+            if (ModelState.IsValid)
+            {
+                // Enforce allowed status transitions: Open -> In Progress -> Resolved
+                var existing = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
+                if (existing != null && existing.Status != maintenanceRequest.Status)
+                {
+                    var allowed = new Dictionary<string, string[]>()
+                    {
+                        { "Open", new[] { "In Progress", "Resolved" } },
+                        { "In Progress", new[] { "Resolved" } },
+                        { "Resolved", new string[] { } }
+                    };
+
+                    if (allowed.ContainsKey(existing.Status) && !allowed[existing.Status].Contains(maintenanceRequest.Status))
+                    {
+                        ModelState.AddModelError(string.Empty, $"Invalid status transition from {existing.Status} to {maintenanceRequest.Status}.");
+                        var unitsInvalid = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+                        var staffInvalid = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+
+                        ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(unitsInvalid, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
+                        ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staffInvalid, "StaffID", "FullName", maintenanceRequest.StaffID);
+                        return View(maintenanceRequest);
+                    }
+
+                    // If marking Resolved, set DateResolved
+                    if (maintenanceRequest.Status == "Resolved")
+                    {
+                        maintenanceRequest.DateResolved = DateTime.Now;
+                    }
+                }
+
+                await _http.PutAsJsonAsync($"api/MaintenanceRequests/{id}", maintenanceRequest);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
+
+            ViewData["UnitID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(units, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
+            ViewData["StaffID"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(staff, "StaffID", "FullName", maintenanceRequest.StaffID);
+            return View(maintenanceRequest);
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
+            if (request == null) return NotFound();
+            return View(request);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _http.DeleteAsync($"api/MaintenanceRequests/{id}");
             return RedirectToAction(nameof(Index));
         }
-        ViewData["UnitID"] = new SelectList(_context.PropertyUnits, "UnitID", "UnitNumber", maintenanceRequest.UnitID);
-        ViewData["StaffID"] = new SelectList(_context.Staff, "StaffID", "FullName", maintenanceRequest.StaffID);
-        return View(maintenanceRequest);
     }
-
-    // GET: MaintenanceRequests/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var maintenanceRequest = await _context.MaintenanceRequests
-            .Include(m => m.PropertyUnit)
-            .Include(m => m.Staff)
-            .FirstOrDefaultAsync(m => m.RequestID == id);
-        if (maintenanceRequest == null)
-        {
-            return NotFound();
-        }
-
-        return View(maintenanceRequest);
-    }
-
-    // POST: MaintenanceRequests/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int id)
-    {
-        var maintenanceRequest = await _context.MaintenanceRequests.FindAsync(id);
-        if (maintenanceRequest != null)
-        {
-            _context.MaintenanceRequests.Remove(maintenanceRequest);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-
-    private bool MaintenanceRequestExists(int id)
-    {
-        return _context.MaintenanceRequests.Any(e => e.RequestID == id);
-    }
-}
 }

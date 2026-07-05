@@ -1,0 +1,48 @@
+@model IEnumerable<PropNest.Models.RentalAgreement>
+
+@{
+    ViewData["Title"] = "Rental Agreements";
+}
+
+<h1>Rental Agreements</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ Add Rental Agreement</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Agreement ID</th>
+            <th>Tenant</th>
+            <th>Unit</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Monthly Rent</th>
+            <th>Security Deposit</th>
+            <th>Status</th>
+            <th>Version</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(model => item.AgreementID)</td>
+                <td>@(item.Tenant?.FullName ?? "N/A")</td>
+                <td>@(item.PropertyUnit?.UnitNumber ?? "N/A")</td>
+                <td>@Html.DisplayFor(model => item.StartDate)</td>
+                <td>@Html.DisplayFor(model => item.EndDate)</td>
+                <td>@Html.DisplayFor(model => item.MonthlyRent)</td>
+                <td>@Html.DisplayFor(model => item.SecurityDeposit)</td>
+                <td>@Html.DisplayFor(model => item.AgreementStatus)</td>
+                <td>@Html.DisplayFor(model => item.Version)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.AgreementID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.AgreementID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.AgreementID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

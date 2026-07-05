@@ -1,68 +1,218 @@
+@model DashboardViewModel
+
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="container mt-4 mb-5">
-    <div class="text-center mb-5">
-        <h1 class="display-4" style="font-weight: 700; letter-spacing: -0.04em;">Dashboard</h1>
-        <p class="lead text-muted" style="font-size: 1.2rem;">Welcome to the PropNest Management System</p>
-    </div>
-    
+<style>
+    .page-title {
+        animation: fadeInDown 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+        margin-bottom: 3rem;
+    }
+
+    .metrics-row {
+        margin-bottom: 3rem;
+    }
+
+    .metric-card {
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .metric-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.8;
+    }
+
+    .nav-cards-section {
+        margin-top: 4rem;
+    }
+
+    .nav-card-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+    }
+
+    .nav-card {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .nav-card:hover {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .nav-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+</style>
+
+<!-- Header Section -->
+<div class="page-title text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3">Welcome to PropNest</h1>
+    <p class="lead text-muted fs-5">Your complete property management dashboard</p>
+</div>
+
+<!-- Key Metrics Section -->
+<div class="metrics-row">
     <div class="row g-4">
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Tenants</h5>
-                    <p class="card-text text-muted mb-4">Manage tenant information and profiles.</p>
-                    <a asp-controller="Tenants" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Tenants</a>
+        <div class="col-12 col-md-6 col-lg-3">
+            <a href="@Url.Action("Index", "RentPayments")" class="nav-card">
+                <div class="metric-card apple-card h-100 p-4">
+                    <div class="text-center">
+                        <div class="metric-icon">💰</div>
+                        <h6 class="metric-label mb-2">Rent Collected</h6>
+                        <h3 class="metric-value" style="color: #34C759;">
+                            @Model.TotalRentCollectedThisMonth.ToString("C0")
+                        </h3>
+                        <p class="metric-subtitle">This month</p>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Properties</h5>
-                    <p class="card-text text-muted mb-4">Manage property units and details.</p>
-                    <a asp-controller="PropertyUnits" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Properties</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Leases</h5>
-                    <p class="card-text text-muted mb-4">Manage lease contracts and terms.</p>
-                    <a asp-controller="LeaseContracts" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Leases</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Payments</h5>
-                    <p class="card-text text-muted mb-4">Track and manage rent payments.</p>
-                    <a asp-controller="RentPayments" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Payments</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Staff</h5>
-                    <p class="card-text text-muted mb-4">Manage maintenance staff and contractors.</p>
-                    <a asp-controller="Staff" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Staff</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="apple-card h-100 p-4">
-                <div class="card-body text-center d-flex flex-column">
-                    <h5 class="card-title fs-4">Maintenance</h5>
-                    <p class="card-text text-muted mb-4">Track and manage maintenance requests.</p>
-                    <a asp-controller="MaintenanceRequests" asp-action="Index" class="btn btn-apple mt-auto align-self-center">Go to Maintenance</a>
-                </div>
-            </div>
+            </a>
         </div>
 
+        <div class="col-12 col-md-6 col-lg-3">
+            <a href="@Url.Action("Index", "PropertyUnits")" class="nav-card">
+                <div class="metric-card apple-card h-100 p-4">
+                    <div class="text-center">
+                        <div class="metric-icon">🏠</div>
+                        <h6 class="metric-label mb-2">Vacant Units</h6>
+                        <h3 class="metric-value" style="color: #FF9500;">
+                            @Model.VacantUnitsCount
+                        </h3>
+                        <p class="metric-subtitle">Available for rent</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <a href="@Url.Action("Index", "RentPayments")" class="nav-card">
+                <div class="metric-card apple-card h-100 p-4">
+                    <div class="text-center">
+                        <div class="metric-icon">⚠️</div>
+                        <h6 class="metric-label mb-2">Overdue</h6>
+                        <h3 class="metric-value" style="color: #FF3B30;">
+                            @Model.OverduePaymentsCount
+                        </h3>
+                        <p class="metric-subtitle">Pending collection</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <a href="@Url.Action("Index", "RentalAgreements")" class="nav-card">
+                <div class="metric-card apple-card h-100 p-4">
+                    <div class="text-center">
+                        <div class="metric-icon">📅</div>
+                        <h6 class="metric-label mb-2">Expiring Soon</h6>
+                        <h3 class="metric-value" style="color: #5AC8FA;">
+                            @Model.AgreementsExpiringIn30Days
+                        </h3>
+                        <p class="metric-subtitle">In next 30 days</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Cards Section -->
+<div class="nav-cards-section">
+    <h2 class="nav-card-title">Quick Access</h2>
+    <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="Tenants" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">👥</span>
+                    <h5 class="card-title fs-5 mb-2">Tenants</h5>
+                    <p class="card-text text-muted mb-3">Manage tenant profiles and information</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="PropertyUnits" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">🏢</span>
+                    <h5 class="card-title fs-5 mb-2">Properties</h5>
+                    <p class="card-text text-muted mb-3">View and manage all property units</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="RentalAgreements" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">📋</span>
+                    <h5 class="card-title fs-5 mb-2">Agreements</h5>
+                    <p class="card-text text-muted mb-3">Manage rental agreements and terms</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="RentPayments" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">💳</span>
+                    <h5 class="card-title fs-5 mb-2">Payments</h5>
+                    <p class="card-text text-muted mb-3">Track and manage rent payments</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="Staff" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">👨‍💼</span>
+                    <h5 class="card-title fs-5 mb-2">Staff</h5>
+                    <p class="card-text text-muted mb-3">Manage maintenance staff and contractors</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-4">
+            <a asp-controller="MaintenanceRequests" asp-action="Index" class="nav-card">
+                <div class="apple-card h-100 p-5 text-center">
+                    <span class="nav-icon">🔧</span>
+                    <h5 class="card-title fs-5 mb-2">Maintenance</h5>
+                    <p class="card-text text-muted mb-3">Track and manage maintenance requests</p>
+                    <div class="d-flex align-items-center justify-content-center gap-1">
+                        <span class="text-primary fw-600">View All</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
