@@ -4,100 +4,119 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<style>
-    .page-title {
-        animation: fadeInDown 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-        margin-bottom: 3rem;
-    }
-
-    .metrics-row {
-        margin-bottom: 3rem;
-    }
-
-    .metric-card {
-        height: 100%;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.02);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .metric-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.8;
-    }
-
-    .nav-cards-section {
-        margin-top: 4rem;
-    }
-
-    .nav-card-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 2rem;
-        letter-spacing: -0.02em;
-    }
-
-    .nav-card {
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        text-decoration: none;
-        color: inherit;
-        display: block;
-    }
-
-    .nav-card:hover {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    .nav-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        display: block;
-    }
-</style>
-
-<!-- Header Section -->
-<div class="page-title text-center mb-5">
-    <h1 class="display-4 fw-bold mb-3">Welcome to PropNest</h1>
-    <p class="lead text-muted fs-5">Your complete property management dashboard</p>
+<!-- Page Header -->
+<div class="page-header mb-5">
+    <h1>Dashboard</h1>
+    <p>Overview of your property management activity</p>
 </div>
 
-<!-- Key Metrics Section -->
-<div class="metrics-row">
-    <div class="row g-4">
-        <div class="col-12 col-md-6 col-lg-3">
-            <a href="@Url.Action("Index", "RentPayments")" class="nav-card">
-                <div class="metric-card apple-card h-100 p-4">
-                    <div class="text-center">
-                        <div class="metric-icon">💰</div>
-                        <h6 class="metric-label mb-2">Rent Collected</h6>
-                        <h3 class="metric-value" style="color: #34C759;">
-                            @Model.TotalRentCollectedThisMonth.ToString("C0")
-                        </h3>
-                        <p class="metric-subtitle">This month</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+<!-- Key Metrics Grid -->
+<div class="row mb-5">
+    <!-- Rent Collected -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
+            <div class="metric-card">
+                <div class="metric-label">Rent Collected</div>
+                <div class="metric-value">@Model.TotalRentCollectedThisMonth.ToString("C0")</div>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">This month</p>
+            </div>
+        </a>
+    </div>
 
-        <div class="col-12 col-md-6 col-lg-3">
-            <a href="@Url.Action("Index", "PropertyUnits")" class="nav-card">
-                <div class="metric-card apple-card h-100 p-4">
-                    <div class="text-center">
-                        <div class="metric-icon">🏠</div>
-                        <h6 class="metric-label mb-2">Vacant Units</h6>
-                        <h3 class="metric-value" style="color: #FF9500;">
-                            @Model.VacantUnitsCount
-                        </h3>
-                        <p class="metric-subtitle">Available for rent</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+    <!-- Vacant Units -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <a href="@Url.Action("Index", "PropertyUnits")" style="text-decoration: none; color: inherit;">
+            <div class="metric-card">
+                <div class="metric-label">Vacant Units</div>
+                <div class="metric-value">@Model.VacantUnitsCount</div>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">Available</p>
+            </div>
+        </a>
+    </div>
 
-        <div class="col-12 col-md-6 col-lg-3">
-            <a href="@Url.Action("Index", "RentPayments")" class="nav-card">
-                <div class="metric-card apple-card h-100 p-4">
+    <!-- Overdue Payments -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
+            <div class="metric-card">
+                <div class="metric-label">Overdue Payments</div>
+                <div class="metric-value" style="color: var(--color-red);">@Model.OverduePaymentsCount</div>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">Need attention</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Expiring Agreements -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <a href="@Url.Action("Index", "RentalAgreements")" style="text-decoration: none; color: inherit;">
+            <div class="metric-card">
+                <div class="metric-label">Expiring Soon</div>
+                <div class="metric-value">@Model.AgreementsExpiringIn30Days</div>
+                <p style="font-size: 0.85rem; color: var(--color-text-muted); margin: 0;">In 30 days</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Quick Navigation -->
+<div class="row">
+    <div class="col-12">
+        <h2 style="margin-bottom: 20px; font-size: 1.3rem; font-weight: 600;">Quick Access</h2>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "Tenants")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Tenants</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">View and manage all tenants</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "PropertyUnits")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Properties</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage your property portfolio</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "RentalAgreements")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Agreements</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Track rental agreements</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "RentPayments")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Payments</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage rent payments</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "Staff")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Staff</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Manage staff members</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-4">
+        <a href="@Url.Action("Index", "MaintenanceRequests")" style="text-decoration: none; color: inherit;">
+            <div class="card" style="border: 1px solid var(--color-border); border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s ease;">
+                <h4 style="margin-bottom: 8px; font-weight: 600;">Maintenance</h4>
+                <p style="color: var(--color-text-muted); margin: 0; font-size: 0.95rem;">Track maintenance requests</p>
+            </div>
+        </a>
+    </div>
+</div>
                     <div class="text-center">
                         <div class="metric-icon">⚠️</div>
                         <h6 class="metric-label mb-2">Overdue</h6>
