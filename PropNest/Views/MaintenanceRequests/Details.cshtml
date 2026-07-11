@@ -1,54 +1,93 @@
 @model PropNest.Models.MaintenanceRequest
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Request Details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>MaintenanceRequest</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            Unit Number
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.PropertyUnit?.UnitNumber ?? "N/A")
-        </dd>
-        <dt class = "col-sm-2">
-            Staff
-        </dt>
-        <dd class = "col-sm-10">
-            @(Model.Staff?.FullName ?? "N/A")
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DateLogged)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DateLogged)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
+<div class="page-header mt-4">
+    <div>
+        <h1>Maintenance Request Details</h1>
+        <p>Repair specifications, logging log, and assigned worker for Req-@Model.RequestID</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.RequestID" class="btn btn-apple">✏️ Edit Request</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.RequestID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="row g-4">
+    <!-- Main request details Card (8 columns) -->
+    <div class="col-12 col-md-8">
+        <div class="apple-card p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom">Issue Specifications</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Assigned Unit</label>
+                    <div>
+                        @if (Model.PropertyUnit != null)
+                        {
+                            <a class="fw-600 text-decoration-none" asp-controller="PropertyUnits" asp-action="Details" asp-route-id="@Model.PropertyUnit.UnitID">
+                                🏢 Unit @Model.PropertyUnit.UnitNumber
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No unit assigned.</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Request Category</label>
+                    <div><span class="badge bg-light text-dark border">@Model.Category</span></div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Assigned Staff Member</label>
+                    <div>
+                        @if (Model.Staff != null)
+                        {
+                            <a class="fw-600 text-decoration-none" asp-controller="Staff" asp-action="Details" asp-route-id="@Model.Staff.StaffID">
+                                👤 @Model.Staff.FullName
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted italic">Unassigned</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Date Logged</label>
+                    <div>@Model.DateLogged.ToString("MMMM dd, yyyy")</div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3 pb-2 border-bottom">Description</h5>
+            <div class="p-3 bg-light rounded border text-muted small" style="min-height: 80px; line-height: 1.5;">
+                @Model.Description
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Sidebar (4 columns) -->
+    <div class="col-12 col-md-4">
+        <div class="apple-card p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom">Resolution Status</h5>
+            <div class="mb-4">
+                <label class="form-label text-muted small uppercase">Current Status</label>
+                <div>
+                    @{
+                        var sc = Model.Status switch {
+                            "Resolved"    => "status-completed",
+                            "In Progress" => "status-pending",
+                            _             => "status-inactive"
+                        };
+                    }
+                    <span class="status-badge @sc">@Model.Status</span>
+                </div>
+            </div>
+            <div class="mb-0">
+                <label class="form-label text-muted small uppercase">Request Code</label>
+                <div><code>Req-@Model.RequestID</code></div>
+            </div>
+        </div>
+    </div>
 </div>

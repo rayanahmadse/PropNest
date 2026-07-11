@@ -40,11 +40,23 @@
             </div>
             <div class="form-group mb-3">
                 <label asp-for="Status" class="control-label"></label>
-                <select asp-for="Status" class="form-control">
-                    <option value="Vacant">Vacant</option>
-                    <option value="Occupied">Occupied</option>
-                    <option value="Under Maintenance">Under Maintenance</option>
-                </select>
+                @if (Model.Status == "Occupied")
+                {
+                    <select class="form-control" disabled>
+                        <option value="Occupied" selected>Occupied</option>
+                    </select>
+                    <input type="hidden" asp-for="Status" />
+                    <small class="text-muted d-block mt-1">
+                        <i class="bi bi-info-circle"></i> Status is managed automatically by active Rental Agreements.
+                    </small>
+                }
+                else
+                {
+                    <select asp-for="Status" class="form-control">
+                        <option value="Vacant">Vacant</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                }
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group mb-3">

@@ -1,71 +1,71 @@
 @model IEnumerable<PropNest.Models.MaintenanceRequest>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Maintenance Requests";
 }
 
-<h1>Index</h1>
+<div class="page-header mt-4">
+    <div>
+        <h1>Maintenance Requests</h1>
+        <p>Track and manage unit repairs and support requests</p>
+    </div>
+    <a asp-action="Create" class="btn btn-apple">+ New Request</a>
+</div>
 
-<p class="create-new-link">
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                Unit Number
-            </th>
-            <th>
-                Staff
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateLogged)
-            </th>
-            <th>
-                Age (days)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @(item.PropertyUnit?.UnitNumber ?? "(none)")
-            </td>
-            <td>
-                @(item.Staff?.FullName ?? "(unassigned)")
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Category)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.DateLogged)
-            </td>
-            <td>
-                @( (DateTime.Now - item.DateLogged).Days )
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RequestID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RequestID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RequestID">Delete</a>
-            </td>
-        </tr>
+@if (Model.Any())
+{
+    <div class="apple-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Unit</th>
+                        <th>Category</th>
+                        <th>Date Logged</th>
+                        <th>Status</th>
+                        <th class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="ps-4"><code>Unit @(item.PropertyUnit?.UnitNumber ?? "N/A")</code></td>
+                            <td><span class="badge bg-light text-dark border">@item.Category</span></td>
+                            <td>@item.DateLogged.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @{
+                                    var sc = item.Status switch {
+                                        "Resolved"    => "status-completed",
+                                        "In Progress" => "status-pending",
+                                        _             => "status-inactive"
+                                    };
+                                }
+                                <span class="status-badge @sc">@item.Status</span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="btn-group-custom justify-content-center">
+                                    <a asp-action="Details" asp-route-id="@item.RequestID" class="btn btn-sm">View Details</a>
+                                    <a asp-action="Edit"    asp-route-id="@item.RequestID" class="btn btn-sm">Edit</a>
+                                    <a asp-action="Delete"  asp-route-id="@item.RequestID" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766l4.002-1.201a11.653 11.653 0 0 1-5.118 4.493l-1.202 4.002a2.386 2.386 0 0 1-.766 1.208l-3.03 2.496ZM11.42 15.17 9.17 12.92m0 0-5.877 5.877A2.652 2.652 0 0 1 1 15c0-1.053.408-2.019 1.077-2.75l5.877-5.877M9.17 12.92l3.03-2.496c.384-.317.626-.74.766-1.208l1.201-4.002a11.653 11.653 0 0 0-4.493 5.118L5.682 9.17a2.386 2.386 0 0 0-1.208.766L1.978 12.97Z" />
+            </svg>
+        </div>
+        <h4>No Maintenance Requests</h4>
+        <p>No active repair or support requests registered in the system.</p>
+        <a asp-action="Create" class="btn btn-apple">+ Log First Request</a>
+    </div>
+}

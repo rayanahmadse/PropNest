@@ -18,6 +18,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             // Auto-close old requests before showing the list via injected service
             try
             {
@@ -28,7 +30,21 @@ namespace PropNest.Controllers
                 // ignore failures here
             }
 
-            var requests = await _http.GetFromJsonAsync<List<MaintenanceRequest>>("api/MaintenanceRequests");
+            var requests = await _http.GetFromJsonAsync<List<MaintenanceRequest>>("api/MaintenanceRequests") ?? new();
+            var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits") ?? new();
+            var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff") ?? new();
+
+            var unitMap = units.ToDictionary(u => u.UnitID);
+            var staffMap = staff.ToDictionary(s => s.StaffID);
+            foreach (var r in requests)
+            {
+                r.PropertyUnit = unitMap.GetValueOrDefault(r.UnitID);
+                if (r.StaffID.HasValue)
+                {
+                    r.Staff = staffMap.GetValueOrDefault(r.StaffID.Value);
+                }
+            }
+
             return View(requests);
         }
 
@@ -37,11 +53,28 @@ namespace PropNest.Controllers
             if (id == null) return NotFound();
             var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
             if (request == null) return NotFound();
+
+            request.PropertyUnit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{request.UnitID}");
+            if (request.StaffID.HasValue)
+            {
+                request.Staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{request.StaffID.Value}");
+            }
+
+            // Log activity
+            PropNest.Helpers.RecentActivityHelper.LogActivity(
+                HttpContext, 
+                $"Viewed Maintenance Request: Req-{request.RequestID}", 
+                $"Category: {request.Category} | Status: {request.Status}",
+                Url.Action("Details", "MaintenanceRequests", new { id = request.RequestID }) ?? ""
+            );
+
             return View(request);
         }
 
         public async Task<IActionResult> Create()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             var units = await _http.GetFromJsonAsync<List<PropertyUnit>>("api/PropertyUnits");
             var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
 
@@ -85,6 +118,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
             if (request == null) return NotFound();
@@ -147,6 +182,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Delete(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var request = await _http.GetFromJsonAsync<MaintenanceRequest>($"api/MaintenanceRequests/{id}");
             if (request == null) return NotFound();
@@ -157,6 +194,11 @@ namespace PropNest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                TempData["Error"] = "Only Admins can delete maintenance requests.";
+                return RedirectToAction(nameof(Index));
+            }
             await _http.DeleteAsync($"api/MaintenanceRequests/{id}");
             return RedirectToAction(nameof(Index));
         }

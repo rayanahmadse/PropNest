@@ -1,0 +1,100 @@
+@{
+    ViewData["Title"] = "Create Account — PropNest";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 440px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        h2 { color: #fff; font-weight: 700; margin-bottom: 0.25rem; }
+        p.subtitle { color: rgba(255,255,255,0.5); margin-bottom: 2rem; font-size: 0.9rem; }
+        .form-label { color: rgba(255,255,255,0.7); font-size: 0.85rem; }
+        .form-control, .form-select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            border-radius: 8px;
+            padding: 0.65rem 1rem;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255,255,255,0.12);
+            border-color: #4e9af1;
+            color: #fff;
+            box-shadow: 0 0 0 3px rgba(78,154,241,0.2);
+        }
+        .form-select option { background: #16213e; color: #fff; }
+        .form-control::placeholder { color: rgba(255,255,255,0.3); }
+        .btn-signup {
+            background: linear-gradient(135deg, #4e9af1, #6c63ff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            padding: 0.7rem;
+            width: 100%;
+        }
+        .btn-signup:hover { opacity: 0.9; color: #fff; }
+        .login-link { color: rgba(255,255,255,0.5); font-size: 0.85rem; text-align: center; margin-top: 1.25rem; }
+        .login-link a { color: #4e9af1; text-decoration: none; }
+        .brand { color: #4e9af1; font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem; display: block; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <span class="brand">🏢 PropNest ERP</span>
+        <h2>Create Account</h2>
+        <p class="subtitle">Set up a new staff account</p>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger" style="border-radius:8px;font-size:.85rem;">@ViewBag.Error</div>
+        }
+
+        <form method="post" asp-action="Signup" asp-controller="Account">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Choose a username" required autofocus />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Choose a password" required />
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select" required>
+                    <option value="Admin">Admin</option>
+                    <option value="Staff" selected>Staff</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-signup">Create Account</button>
+        </form>
+
+        <p class="login-link">
+            Already have an account? <a asp-action="Login" asp-controller="Account">Sign in</a>
+        </p>
+    </div>
+</body>
+</html>

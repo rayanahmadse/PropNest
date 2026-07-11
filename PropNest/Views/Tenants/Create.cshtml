@@ -1,60 +1,53 @@
 @model PropNest.Models.Tenant
+@{ ViewData["Title"] = "New Tenant"; }
 
-@{
-    ViewData["Title"] = "Create";
-}
-
-<h1>Create</h1>
-
-<h4>Tenant</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group">
-                <label asp-for="FullName" class="control-label"></label>
-                <input asp-for="FullName" class="form-control" />
-                <span asp-validation-for="FullName" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="CNIC" class="control-label"></label>
-                <input asp-for="CNIC" class="form-control" />
-                <span asp-validation-for="CNIC" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="ContactNumber" class="control-label"></label>
-                <input asp-for="ContactNumber" class="form-control" />
-                <span asp-validation-for="ContactNumber" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="EmergencyContact" class="control-label"></label>
-                <input asp-for="EmergencyContact" class="form-control" />
-                <span asp-validation-for="EmergencyContact" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="page-header mt-4">
+    <div>
+        <h1>New Tenant</h1>
+        <p>Add a new tenant to the system</p>
     </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Back</a>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="form-card">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" placeholder="Full name" />
+            <span asp-validation-for="FullName" class="text-danger small"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="CNIC" class="form-label"></label>
+            <input asp-for="CNIC" class="form-control" placeholder="e.g. 35202-1234567-1" />
+            <span asp-validation-for="CNIC" class="text-danger small"></span>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="email@example.com" />
+            </div>
+            <div class="col-md-6">
+                <label asp-for="ContactNumber" class="form-label"></label>
+                <input asp-for="ContactNumber" class="form-control" placeholder="+92 300 0000000" />
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="EmergencyContact" class="form-label"></label>
+            <input asp-for="EmergencyContact" class="form-control" placeholder="Emergency contact number" />
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Status</label>
+            <div>
+                <span class="status-badge sc-inactive">Inactive</span>
+                <small class="text-muted ms-2">Automatically set to <strong>Active</strong> once assigned to a rental agreement.</small>
+            </div>
+            <input type="hidden" name="Status" value="Inactive" />
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-apple">Save Tenant</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </form>
 </div>

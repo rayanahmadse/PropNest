@@ -1,70 +1,128 @@
 @model IEnumerable<PropNest.Models.RentPayment>
+@{ ViewData["Title"] = "Rent Payments"; }
 
-@{
-    ViewData["Title"] = "Rent Payments";
+<div class="page-header mt-4">
+    <div>
+        <h1>Rent Payments</h1>
+        <p>Track and manage all rent payment records</p>
+    </div>
+    <a asp-action="Create" class="btn btn-apple">+ Add Payment</a>
+</div>
+
+@if (ViewBag.Filter == "Overdue")
+{
+    <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" style="background-color: #fef2f2; color: #dc2626; border-radius: var(--radius-md);">
+        <div class="d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+            <span>Showing only <strong>Overdue Payments</strong>.</span>
+        </div>
+        <a asp-action="Index" class="btn btn-sm btn-apple" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background-color: #dc2626; border-color: #dc2626;">Show All Payments</a>
+    </div>
+}
+else if (ViewBag.Filter == "CollectedThisMonth")
+{
+    <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" style="background-color: #f0fdf4; color: #16a34a; border-radius: var(--radius-md);">
+        <div class="d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            <span>Showing only <strong>Payments Collected This Month</strong>.</span>
+        </div>
+        <a asp-action="Index" class="btn btn-sm btn-apple" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background-color: #16a34a; border-color: #16a34a;">Show All Payments</a>
+    </div>
 }
 
-<h1>Rent Payments</h1>
+<div class="search-filter-bar mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" style="width: 1.1rem; height: 1.1rem; opacity: 0.7;">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.602 10.602Z" />
+                    </svg>
+                </span>
+                <input type="text" class="form-control" name="search" value="@ViewBag.Search"
+                       placeholder="Search by name, status, or method..." />
+            </div>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-apple flex-grow-1">Search</button>
+            <a asp-action="Index" class="btn btn-outline-secondary flex-grow-1">Clear</a>
+        </div>
+    </form>
+</div>
 
-<form method="get" class="mb-3">
-    <div class="input-group">
-        <input type="text" class="form-control" name="search" value="@ViewBag.Search" placeholder="Search payments by ID, agreement, status, or method" />
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+@if (Model.Any())
+{
+    <div class="apple-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Tenant</th>
+                        <th>Pay #</th>
+                        <th>Due Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="ps-4">
+                                @{
+                                    var agLabel = ViewBag.AgreementLabels as Dictionary<int, string>;
+                                    var lbl = agLabel != null && agLabel.TryGetValue(item.AgreementID, out var l) ? l : $"Arg-{item.AgreementID}";
+                                }
+                                <code>@lbl</code>
+                            </td>
+                            <td>
+                                @{
+                                    var payNums = ViewBag.PaymentNumbers as Dictionary<int, string>;
+                                    var payNum = payNums != null && payNums.TryGetValue(item.PaymentID, out var pn) ? pn : "—";
+                                }
+                                <span class="fw-600" style="font-family: monospace; letter-spacing: 0.05em;">@payNum</span>
+                            </td>
+                            <td>@item.DueDate.ToString("MMM dd, yyyy")</td>
+                            <td><span class="fw-600">Rs. @item.AmountPaid.ToString("N0")</span></td>
+                            <td>
+                                @{
+                                    var sc = item.Status switch {
+                                        "Paid"    => "status-paid",
+                                        "Overdue" => "status-overdue",
+                                        _         => "status-pending"
+                                    };
+                                }
+                                <span class="status-badge @sc">@item.Status</span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="btn-group-custom justify-content-center">
+                                    <a asp-action="Details" asp-route-id="@item.PaymentID" class="btn btn-sm">View Details</a>
+                                    <a asp-action="Edit"    asp-route-id="@item.PaymentID" class="btn btn-sm">Edit</a>
+                                    <a asp-action="Delete"  asp-route-id="@item.PaymentID" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
-</form>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">+ Add Rent Payment</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Payment ID</th>
-            <th>Agreement ID</th>
-            <th>Payment Date</th>
-            <th>Due Date</th>
-            <th>Amount Paid</th>
-            <th>Late Fee</th>
-            <th>Payment Method</th>
-            <th>Status</th>
-            <th>Reminder</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(model => item.PaymentID)</td>
-                <td>@Html.DisplayFor(model => item.AgreementID)</td>
-                <td>@(item.PaymentDate.HasValue ? item.PaymentDate.Value.ToShortDateString() : "-")</td>
-                <td>@Html.DisplayFor(model => item.DueDate)</td>
-                <td>@Html.DisplayFor(model => item.AmountPaid)</td>
-                <td>@item.LateFeeAmount.ToString("C")</td>
-                <td>@Html.DisplayFor(model => item.PaymentMethod)</td>
-                <td>@Html.DisplayFor(model => item.Status)</td>
-                <td>
-                    @(item.ReminderSent ? $"Sent {(item.ReminderSentAt?.ToShortDateString() ?? "")}" : "Pending")
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.PaymentID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.PaymentID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.PaymentID">Delete</a> |
-                    @if (item.ReminderSent == false)
-                    {
-                        <a asp-action="MarkReminderSent" asp-route-id="@item.PaymentID" class="btn btn-link">Send Reminder</a>
-                    }
-                    @if (item.ReceiptGenerated)
-                    {
-                        <a class="btn btn-link" href="https://localhost:7120/api/RentPayments/@item.PaymentID/receipt" target="_blank">Download Receipt</a>
-                    }
-                    else
-                    {
-                        <a asp-action="Details" asp-route-id="@item.PaymentID" class="btn btn-link">View / Generate Receipt</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+}
+else
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6.188 3.75h16.875A2.25 2.25 0 0 0 22.5 18V6a2.25 2.25 0 0 0-2.25-2.25H3.75A2.25 2.25 0 0 0 1.5 6v12a2.25 2.25 0 0 0 2.25 2.25Z" />
+            </svg>
+        </div>
+        <h4>No Payments Found</h4>
+        <p>No rent payments match your search. Payments are auto-generated when agreements are created.</p>
+        <a asp-action="Index" class="btn btn-apple">Clear Filter</a>
+    </div>
+}

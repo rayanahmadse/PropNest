@@ -1,46 +1,84 @@
 @model IEnumerable<PropNest.Models.PropertyUnit>
-
 @{
     ViewData["Title"] = "Properties";
 }
 
-<h1>Properties</h1>
+<div class="page-header mt-4">
+    <div>
+        <h1>Properties</h1>
+        <p>Manage and track all real estate property units</p>
+    </div>
+    <a asp-action="Create" class="btn btn-apple">+ Add Property</a>
+</div>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">+ Add Property</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Unit Number</th>
-            <th>Type</th>
-            <th>Floor</th>
-            <th>Area (sqft)</th>
-            <th>Amenities</th>
-            <th>Status</th>
-            <th>Asking Rent</th>
-            <th>Vacant Since</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(model => item.UnitNumber)</td>
-                <td>@Html.DisplayFor(model => item.PropertyType)</td>
-                <td>@Html.DisplayFor(model => item.FloorLevel)</td>
-                <td>@Html.DisplayFor(model => item.AreaSqFt)</td>
-                <td>@Html.DisplayFor(model => item.Amenities)</td>
-                <td>@Html.DisplayFor(model => item.Status)</td>
-                <td>@Html.DisplayFor(model => item.AskingRent)</td>
-                <td>@(item.VacantSince.HasValue ? item.VacantSince.Value.ToShortDateString() : "-")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.UnitID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.UnitID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.UnitID">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (ViewBag.Filter == "Vacant")
+{
+    <div class="alert alert-info d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" style="background-color: #eff6ff; color: #2563eb; border-radius: var(--radius-md);">
+        <div class="d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+            </svg>
+            <span>Showing only <strong>Vacant Units</strong>.</span>
+        </div>
+        <a asp-action="Index" class="btn btn-sm btn-apple" style="padding: 0.25rem 0.75rem; font-size: 0.8rem; background-color: #2563eb; border-color: #2563eb;">Show All Units</a>
+    </div>
+}
+
+@if (Model.Any())
+{
+    <div class="apple-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Unit Number</th>
+                        <th>Type</th>
+                        <th>Asking Rent</th>
+                        <th>Status</th>
+                        <th class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="ps-4"><span class="fw-600">@item.UnitNumber</span></td>
+                            <td>@item.PropertyType</td>
+                            <td><span class="fw-600">Rs. @item.AskingRent.ToString("N0")</span></td>
+                            <td>
+                                @{
+                                    var sc = item.Status switch {
+                                        "Vacant"   => "status-vacant",
+                                        "Occupied" => "status-occupied",
+                                        _          => "status-inactive"
+                                    };
+                                }
+                                <span class="status-badge @sc">@item.Status</span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="btn-group-custom justify-content-center">
+                                    <a asp-action="Details" asp-route-id="@item.UnitID" class="btn btn-sm">View Details</a>
+                                    <a asp-action="Edit"    asp-route-id="@item.UnitID" class="btn btn-sm">Edit</a>
+                                    <a asp-action="Delete"  asp-route-id="@item.UnitID" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 16.5h1.5m3 0H15" />
+            </svg>
+        </div>
+        <h4>No Properties Found</h4>
+        <p>There are currently no property units registered in the system.</p>
+        <a asp-action="Create" class="btn btn-apple">+ Create First Property</a>
+    </div>
+}

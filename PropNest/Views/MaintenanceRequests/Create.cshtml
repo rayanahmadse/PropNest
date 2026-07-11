@@ -27,7 +27,13 @@
 
             <div class="form-group">
                 <label asp-for="Category" class="control-label"></label>
-                <input asp-for="Category" class="form-control" />
+                <select asp-for="Category" class="form-control">
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Structural">Structural</option>
+                    <option value="General">General</option>
+                    <option value="Other">Other</option>
+                </select>
                 <span asp-validation-for="Category" class="text-danger"></span>
             </div>
 
@@ -49,7 +55,11 @@
 
             <div class="form-group">
                 <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
+                <select asp-for="Status" class="form-control">
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
 

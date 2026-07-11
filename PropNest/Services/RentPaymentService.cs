@@ -13,35 +13,31 @@ namespace PropNest.Services
         }
 
         /// <summary>
-        /// Generate monthly rent payments automatically from StartDate to EndDate
+        /// Generate the first rent payment when an agreement is created.
+        /// DueDate = StartDate + 1 month (e.g. start July 11 → due August 11).
+        /// Only creates a single "Pending" payment — subsequent months are added
+        /// when the previous month's payment is marked Paid.
         /// </summary>
         public List<RentPayment> GenerateMonthlyPayments(RentalAgreement agreement)
         {
-            var payments = new List<RentPayment>();
+            var firstDueDate = agreement.StartDate.AddMonths(1);
 
-            // Start from the agreement's StartDate
-            var currentDueDate = agreement.StartDate;
+            // Don't create payment if it falls past the agreement end date
+            if (firstDueDate > agreement.EndDate)
+                return new List<RentPayment>();
 
-            // Generate one payment per month until EndDate
-            while (currentDueDate <= agreement.EndDate)
+            return new List<RentPayment>
             {
-                var payment = new RentPayment
+                new RentPayment
                 {
-                    AgreementID = agreement.AgreementID,
-                    DueDate = currentDueDate,
-                    PaymentDate = null, // Not paid yet
-                    AmountPaid = agreement.MonthlyRent,
-                    PaymentMethod = "Pending",
-                    Status = "Pending"
-                };
-
-                payments.Add(payment);
-
-                // Move to next month
-                currentDueDate = currentDueDate.AddMonths(1);
-            }
-
-            return payments;
+                    AgreementID   = agreement.AgreementID,
+                    DueDate       = firstDueDate,
+                    PaymentDate   = null,
+                    AmountPaid    = agreement.MonthlyRent,
+                    PaymentMethod = "Cash",   // "Pending" violates DB constraint; Cash = placeholder
+                    Status        = "Pending"
+                }
+            };
         }
 
         /// <summary>
@@ -90,6 +86,39 @@ namespace PropNest.Services
             catch
             {
                 // Silently fail - don't break the app if overdue check fails
+            }
+        }
+
+        /// <summary>
+        /// Check and update expired agreements, freeing their property units
+        /// </summary>
+        public async Task CheckAndUpdateExpiredAgreementsAsync()
+        {
+            try
+            {
+                var agreements = await _http.GetFromJsonAsync<List<RentalAgreement>>("api/RentalAgreements");
+                if (agreements == null) return;
+
+                var today = DateTime.Today;
+                foreach (var agreement in agreements.Where(a => a.AgreementStatus == "Active" && a.EndDate < today))
+                {
+                    // Update agreement status to Expired
+                    agreement.AgreementStatus = "Expired";
+                    await _http.PutAsJsonAsync($"api/RentalAgreements/{agreement.AgreementID}", agreement);
+
+                    // Free up the unit
+                    var unit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{agreement.UnitID}");
+                    if (unit != null)
+                    {
+                        unit.Status = "Vacant";
+                        unit.VacantSince = today;
+                        await _http.PutAsJsonAsync($"api/PropertyUnits/{unit.UnitID}", unit);
+                    }
+                }
+            }
+            catch
+            {
+                // Silently fail
             }
         }
     }

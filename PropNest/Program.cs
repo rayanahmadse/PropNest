@@ -8,6 +8,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient();
 
+// Session setup
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
 // Services
 builder.Services.AddScoped<PropNest.Services.MaintenanceRequestService>();
 
@@ -27,6 +31,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 app.UseAuthorization();
 
 app.MapControllerRoute(

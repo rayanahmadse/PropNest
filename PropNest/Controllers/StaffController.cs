@@ -15,6 +15,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             var staff = await _http.GetFromJsonAsync<List<Staff>>("api/Staff");
             return View(staff);
         }
@@ -29,6 +31,8 @@ namespace PropNest.Controllers
 
         public IActionResult Create()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             return View();
         }
 
@@ -46,6 +50,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{id}");
             if (staff == null) return NotFound();
@@ -67,6 +73,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Delete(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var staff = await _http.GetFromJsonAsync<Staff>($"api/Staff/{id}");
             if (staff == null) return NotFound();
@@ -77,6 +85,11 @@ namespace PropNest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                TempData["Error"] = "Only Admins can delete staff members.";
+                return RedirectToAction(nameof(Index));
+            }
             await _http.DeleteAsync($"api/Staff/{id}");
             return RedirectToAction(nameof(Index));
         }

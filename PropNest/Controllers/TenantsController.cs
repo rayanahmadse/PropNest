@@ -16,6 +16,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Index(string? search)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             var tenants = await _http.GetFromJsonAsync<List<Tenant>>("api/Tenants") ?? new List<Tenant>();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -74,11 +76,21 @@ namespace PropNest.Controllers
                 MaintenanceRequests = tenantRequests
             };
 
+            // Log activity
+            PropNest.Helpers.RecentActivityHelper.LogActivity(
+                HttpContext, 
+                $"Viewed Tenant: {tenant.FullName}", 
+                $"CNIC: {tenant.CNIC} | Status: {tenant.Status}",
+                Url.Action("Details", "Tenants", new { id = tenant.TenantID }) ?? ""
+            );
+
             return View(vm);
         }
 
         public IActionResult Create()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             return View();
         }
 
@@ -96,6 +108,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Edit(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var tenant = await _http.GetFromJsonAsync<Tenant>($"api/Tenants/{id}");
             if (tenant == null) return NotFound();
@@ -117,6 +131,8 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Delete(int? id)
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
             if (id == null) return NotFound();
             var tenant = await _http.GetFromJsonAsync<Tenant>($"api/Tenants/{id}");
             if (tenant == null) return NotFound();
@@ -127,6 +143,11 @@ namespace PropNest.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (HttpContext.Session.GetString("Role") != "Admin")
+            {
+                TempData["Error"] = "Only Admins can delete tenants.";
+                return RedirectToAction(nameof(Index));
+            }
             var agreements = await _http.GetFromJsonAsync<List<RentalAgreement>>("api/RentalAgreements") ?? new List<RentalAgreement>();
             var hasActiveAgreement = agreements.Any(a => a.TenantID == id && a.AgreementStatus == "Active");
 

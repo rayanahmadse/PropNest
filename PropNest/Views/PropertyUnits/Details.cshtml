@@ -1,31 +1,76 @@
 @model PropNest.Models.PropertyUnit
-
 @{
     ViewData["Title"] = "Property Details";
 }
 
-<h1>Property Details</h1>
-<hr />
-<dl class="row">
-    <dt class="col-sm-3">Unit Number</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.UnitNumber)</dd>
-    <dt class="col-sm-3">Type</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.PropertyType)</dd>
-    <dt class="col-sm-3">Floor Level</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.FloorLevel)</dd>
-    <dt class="col-sm-3">Area (sqft)</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.AreaSqFt)</dd>
-    <dt class="col-sm-3">Amenities</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.Amenities)</dd>
-    <dt class="col-sm-3">Status</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.Status)</dd>
-    <dt class="col-sm-3">Asking Rent</dt>
-    <dd class="col-sm-9">@Html.DisplayFor(model => model.AskingRent)</dd>
-    <dt class="col-sm-3">Vacant Since</dt>
-    <dd class="col-sm-9">@(Model.VacantSince.HasValue ? Model.VacantSince.Value.ToShortDateString() : "-")</dd>
-</dl>
+<div class="page-header mt-4">
+    <div>
+        <h1>Property Details</h1>
+        <p>Operational info, rent settings, and status for Unit @Model.UnitNumber</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.UnitID" class="btn btn-apple">✏️ Edit Property</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </div>
+</div>
 
-<div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.UnitID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="row g-4">
+    <!-- Unit Details Card (8 columns) -->
+    <div class="col-12 col-md-8">
+        <div class="apple-card p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom">Property Specifications</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Unit Number</label>
+                    <div class="fw-600">@Model.UnitNumber</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Property Type</label>
+                    <div>@Model.PropertyType</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Floor Level</label>
+                    <div>@Model.FloorLevel</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-muted small uppercase">Area (Square Feet)</label>
+                    <div>@(Model.AreaSqFt?.ToString("N0") ?? "0") sqft</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label text-muted small uppercase">Amenities & Features</label>
+                    <div class="p-3 bg-light rounded border text-muted small" style="min-height: 50px;">
+                        @(string.IsNullOrWhiteSpace(Model.Amenities) ? "No specific amenities registered." : Model.Amenities)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status & Finance Sidebar (4 columns) -->
+    <div class="col-12 col-md-4">
+        <div class="apple-card p-4">
+            <h5 class="fw-bold mb-4 pb-2 border-bottom">Status & Rent</h5>
+            <div class="mb-4">
+                <label class="form-label text-muted small uppercase">Monthly Asking Rent</label>
+                <div class="fw-800 text-brand" style="font-size: 1.6rem;">Rs. @Model.AskingRent.ToString("N0")</div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted small uppercase">Rental Status</label>
+                <div>
+                    @{
+                        var sc = Model.Status switch {
+                            "Vacant"   => "status-vacant",
+                            "Occupied" => "status-occupied",
+                            _          => "status-inactive"
+                        };
+                    }
+                    <span class="status-badge @sc">@Model.Status</span>
+                </div>
+            </div>
+            <div class="mb-0">
+                <label class="form-label text-muted small uppercase">Vacant Since</label>
+                <div>@(Model.VacantSince.HasValue ? Model.VacantSince.Value.ToString("MMMM dd, yyyy") : "Currently Occupied")</div>
+            </div>
+        </div>
+    </div>
 </div>

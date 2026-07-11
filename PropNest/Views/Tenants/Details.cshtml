@@ -4,148 +4,215 @@
     ViewData["Title"] = "Tenant Details";
 }
 
-<h1>Tenant Details</h1>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+<div class="page-header mt-4">
+    <div>
+        <h1>Tenant Details</h1>
+        <p>Profile info, active agreement, and history for @(Model.Tenant?.FullName ?? "Tenant")</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Tenant?.TenantID" class="btn btn-apple">✏️ Edit Profile</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+    </div>
+</div>
 
 @if (Model.Tenant != null)
 {
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-3">
-                <div class="card-header">Tenant Profile</div>
-                <div class="card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5">Name</dt>
-                        <dd class="col-sm-7">@Model.Tenant.FullName</dd>
-                        <dt class="col-sm-5">CNIC</dt>
-                        <dd class="col-sm-7">@Model.Tenant.CNIC</dd>
-                        <dt class="col-sm-5">Email</dt>
-                        <dd class="col-sm-7">@Model.Tenant.Email</dd>
-                        <dt class="col-sm-5">Contact</dt>
-                        <dd class="col-sm-7">@Model.Tenant.ContactNumber</dd>
-                        <dt class="col-sm-5">Emergency</dt>
-                        <dd class="col-sm-7">@Model.Tenant.EmergencyContact</dd>
-                        <dt class="col-sm-5">Status</dt>
-                        <dd class="col-sm-7">@Model.Tenant.Status</dd>
-                    </dl>
+    <div class="row g-4">
+        <!-- Sidebar profile (4 cols) -->
+        <div class="col-12 col-md-4">
+            <!-- Profile Info -->
+            <div class="apple-card p-4 mb-4">
+                <h5 class="fw-bold mb-4 pb-2 border-bottom">Tenant Profile</h5>
+                <div class="mb-3">
+                    <label class="form-label text-muted small uppercase">Full Name</label>
+                    <div class="fw-600">@Model.Tenant.FullName</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small uppercase">CNIC / ID</label>
+                    <div><code>@Model.Tenant.CNIC</code></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small uppercase">Email Address</label>
+                    <div><a href="mailto:@Model.Tenant.Email">@Model.Tenant.Email</a></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small uppercase">Contact Number</label>
+                    <div><a href="tel:@Model.Tenant.ContactNumber">@Model.Tenant.ContactNumber</a></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small uppercase">Emergency Contact</label>
+                    <div>@Model.Tenant.EmergencyContact</div>
+                </div>
+                <div class="mb-0">
+                    <label class="form-label text-muted small uppercase">Status</label>
+                    <div>
+                        @{
+                            var sc = Model.Tenant.Status == "Active" ? "status-active" : "status-inactive";
+                        }
+                        <span class="status-badge @sc">@Model.Tenant.Status</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-3">
-                <div class="card-header">Current Agreement</div>
-                <div class="card-body">
-                    @if (Model.ActiveAgreement != null)
-                    {
-                        <dl class="row mb-0">
-                            <dt class="col-sm-5">Agreement ID</dt>
-                            <dd class="col-sm-7">@Model.ActiveAgreement.AgreementID</dd>
-                            <dt class="col-sm-5">Unit</dt>
-                            <dd class="col-sm-7">@(Model.ActiveUnit?.UnitNumber ?? "-")</dd>
-                            <dt class="col-sm-5">Status</dt>
-                            <dd class="col-sm-7">@Model.ActiveAgreement.AgreementStatus</dd>
-                            <dt class="col-sm-5">Start</dt>
-                            <dd class="col-sm-7">@Model.ActiveAgreement.StartDate.ToShortDateString()</dd>
-                            <dt class="col-sm-5">End</dt>
-                            <dd class="col-sm-7">@Model.ActiveAgreement.EndDate.ToShortDateString()</dd>
-                            <dt class="col-sm-5">Monthly Rent</dt>
-                            <dd class="col-sm-7">@Model.ActiveAgreement.MonthlyRent.ToString("C")</dd>
-                        </dl>
-                    }
-                    else
-                    {
-                        <span>No active agreement.</span>
-                    }
-                </div>
+            <!-- Active Agreement -->
+            <div class="apple-card p-4">
+                <h5 class="fw-bold mb-4 pb-2 border-bottom">Current Agreement</h5>
+                @if (Model.ActiveAgreement != null)
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted small uppercase">Agreement ID</label>
+                        <div><code>Agr-@Model.ActiveAgreement.AgreementID</code></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small uppercase">Assigned Unit</label>
+                        <div class="fw-600">Unit @(Model.ActiveUnit?.UnitNumber ?? "—")</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small uppercase">Rent / Deposit</label>
+                        <div>
+                            Rs. @Model.ActiveAgreement.MonthlyRent.ToString("N0") /mo<br />
+                            <span class="text-muted small">Deposit: Rs. @Model.ActiveAgreement.SecurityDeposit.ToString("N0")</span>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label text-muted small uppercase">Agreement Period</label>
+                        <div>@Model.ActiveAgreement.StartDate.ToString("MMM dd, yyyy") to @Model.ActiveAgreement.EndDate.ToString("MMM dd, yyyy")</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-3 text-muted small">No active rental agreement registered.</div>
+                }
             </div>
         </div>
 
-        <div class="col-md-8">
-            <div class="card mb-3">
-                <div class="card-header">All Agreements</div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm">
+        <!-- History tabs/tables (8 cols) -->
+        <div class="col-12 col-md-8">
+            <!-- Rental History -->
+            <div class="apple-card p-4 mb-4">
+                <h5 class="fw-bold mb-3">All Rental Agreements</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:0.85rem;">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>Agreement ID</th>
                                 <th>Unit</th>
-                                <th>Status</th>
-                                <th>Start</th>
-                                <th>End</th>
                                 <th>Rent</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var agreement in Model.Agreements)
-                        {
-                            <tr>
-                                <td>@agreement.AgreementID</td>
-                                <td>@agreement.UnitID</td>
-                                <td>@agreement.AgreementStatus</td>
-                                <td>@agreement.StartDate.ToShortDateString()</td>
-                                <td>@agreement.EndDate.ToShortDateString()</td>
-                                <td>@agreement.MonthlyRent.ToString("C")</td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header">Payment History</div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Due</th>
-                                <th>Paid</th>
+                                <th>Period</th>
                                 <th>Status</th>
-                                <th>Late Fee</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach (var payment in Model.RentPayments)
-                        {
-                            <tr>
-                                <td>@payment.PaymentID</td>
-                                <td>@payment.DueDate.ToShortDateString()</td>
-                                <td>@(payment.PaymentDate?.ToShortDateString() ?? "-")</td>
-                                <td>@payment.Status</td>
-                                <td>@payment.LateFeeAmount.ToString("C")</td>
-                            </tr>
-                        }
+                            @if (Model.Agreements.Any())
+                            {
+                                @foreach (var agreement in Model.Agreements)
+                                {
+                                    <tr class="align-middle">
+                                        <td><code>Agr-@agreement.AgreementID</code></td>
+                                        <td>Unit @agreement.UnitID</td>
+                                        <td>Rs. @agreement.MonthlyRent.ToString("N0")</td>
+                                        <td>@agreement.StartDate.ToString("MM/dd/yy") - @agreement.EndDate.ToString("MM/dd/yy")</td>
+                                        <td>
+                                            @{
+                                                var asc = agreement.AgreementStatus == "Active" ? "status-active" : "status-inactive";
+                                            }
+                                            <span class="status-badge @asc" style="font-size:0.7rem; padding:0.15rem 0.45rem;">@agreement.AgreementStatus</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-3 text-muted small">No agreements listed.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="card mb-3">
-                <div class="card-header">Maintenance Requests</div>
-                <div class="card-body table-responsive">
-                    <table class="table table-sm">
+            <!-- Payment History -->
+            <div class="apple-card p-4 mb-4">
+                <h5 class="fw-bold mb-3">Payment History</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:0.85rem;">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>Payment ID</th>
+                                <th>Due Date</th>
+                                <th>Payment Date</th>
+                                <th>Late Fee</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RentPayments.Any())
+                            {
+                                @foreach (var payment in Model.RentPayments)
+                                {
+                                    <tr class="align-middle">
+                                        <td><code>#@payment.PaymentID</code></td>
+                                        <td>@payment.DueDate.ToString("MMM dd, yyyy")</td>
+                                        <td>@(payment.PaymentDate.HasValue ? payment.PaymentDate.Value.ToString("MMM dd, yyyy") : "—")</td>
+                                        <td>Rs. @payment.LateFeeAmount.ToString("N0")</td>
+                                        <td>
+                                            @{
+                                                var psc = payment.Status == "Paid" ? "status-paid" : "status-pending";
+                                            }
+                                            <span class="status-badge @psc" style="font-size:0.7rem; padding:0.15rem 0.45rem;">@payment.Status</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-3 text-muted small">No payment history found.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Maintenance Requests -->
+            <div class="apple-card p-4">
+                <h5 class="fw-bold mb-3">Maintenance Request History</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
                                 <th>Category</th>
                                 <th>Date Logged</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach (var request in Model.MaintenanceRequests)
-                        {
-                            <tr>
-                                <td>@request.RequestID</td>
-                                <td>@request.Category</td>
-                                <td>@request.DateLogged.ToShortDateString()</td>
-                                <td>@request.Status</td>
-                            </tr>
-                        }
+                            @if (Model.MaintenanceRequests.Any())
+                            {
+                                @foreach (var request in Model.MaintenanceRequests)
+                                {
+                                    <tr class="align-middle">
+                                        <td><code>Req-@request.RequestID</code></td>
+                                        <td>@request.Category</td>
+                                        <td>@request.DateLogged.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            @{
+                                                var msc = request.Status == "Resolved" ? "status-completed" : "status-pending";
+                                            }
+                                            <span class="status-badge @msc" style="font-size:0.7rem; padding:0.15rem 0.45rem;">@request.Status</span>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted small">No maintenance requests logged.</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -153,8 +220,3 @@
         </div>
     </div>
 }
-
-<div class="mt-3">
-    <a asp-action="Edit" asp-route-id="@Model.Tenant?.TenantID" class="btn btn-warning">Edit</a>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</div>

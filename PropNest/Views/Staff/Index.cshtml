@@ -1,53 +1,68 @@
 @model IEnumerable<PropNest.Models.Staff>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Staff Directory";
 }
 
-<h1>Index</h1>
+<div class="page-header mt-4">
+    <div>
+        <h1>Staff Directory</h1>
+        <p>Manage system users, support workers, and service specialists</p>
+    </div>
+    <a asp-action="Create" class="btn btn-apple">+ Add Staff</a>
+</div>
 
-<p class="create-new-link">
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ContactNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Specialty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.ContactNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Specialty)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.StaffID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.StaffID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.StaffID">Delete</a>
-            </td>
-        </tr>
+@if (Model.Any())
+{
+    <div class="apple-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Full Name</th>
+                        <th>Specialty / Role</th>
+                        <th>Status</th>
+                        <th class="text-center pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="ps-4"><span class="fw-600">@item.FullName</span></td>
+                            <td><span class="badge bg-light text-dark border">@item.Specialty</span></td>
+                            <td>
+                                @{
+                                    var sc = item.Status switch {
+                                        "Active" => "status-active",
+                                        _        => "status-inactive"
+                                    };
+                                }
+                                <span class="status-badge @sc">@item.Status</span>
+                            </td>
+                            <td class="text-center pe-4">
+                                <div class="btn-group-custom justify-content-center">
+                                    <a asp-action="Details" asp-route-id="@item.StaffID" class="btn btn-sm">View Details</a>
+                                    <a asp-action="Edit"    asp-route-id="@item.StaffID" class="btn btn-sm">Edit</a>
+                                    <a asp-action="Delete"  asp-route-id="@item.StaffID" class="btn btn-sm btn-danger">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" style="width:3rem;height:3rem;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 .621-.504 1.125-1.125 1.125H4.875c-.621 0-1.125-.504-1.125-1.125v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.453.25-.718.25H4.875a1.03 1.03 0 0 1-.718-.25m16.5 0a2.18 2.18 0 0 1-.75-1.661v-3.07c0-1.08-.768-2.015-1.837-2.175a48.11 48.11 0 0 0-3.413-.387m4.5 8.006V9M12 3v3.75m0 0H8.25m3.75 0H15.75" />
+            </svg>
+        </div>
+        <h4>No Staff Members Found</h4>
+        <p>No staff records are currently in the system.</p>
+        <a asp-action="Create" class="btn btn-apple">+ Add First Staff Member</a>
+    </div>
+}

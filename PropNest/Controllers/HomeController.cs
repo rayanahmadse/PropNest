@@ -19,6 +19,17 @@ namespace PropNest.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (HttpContext.Session.GetString("Username") == null)
+                return RedirectToAction("Login", "Account");
+
+            var role = HttpContext.Session.GetString("Role");
+            ViewBag.Role = role;
+            ViewBag.Username = HttpContext.Session.GetString("Username");
+
+            // Read list of recent activities using helper
+            var activities = PropNest.Helpers.RecentActivityHelper.GetActivities(HttpContext);
+            ViewBag.RecentActivities = activities;
+
             var viewModel = new DashboardViewModel();
 
             try
@@ -35,9 +46,14 @@ namespace PropNest.Controllers
                     var monthStart = new DateTime(now.Year, now.Month, 1);
 
                     viewModel.TotalRentCollectedThisMonth = payments
-                        .Where(p => p["status"]?.ToString() == "Paid" &&
-                                    DateTime.Parse(p["paymentDate"]?.ToString() ?? "1900-01-01") >= monthStart)
-                        .Sum(p => decimal.Parse(p["amount"]?.ToString() ?? "0"));
+                        .Where(p =>
+                        {
+                            if (p["status"]?.ToString() != "Paid") return false;
+                            var dateStr = p["paymentDate"]?.ToString();
+                            if (string.IsNullOrWhiteSpace(dateStr)) return false;
+                            return DateTime.TryParse(dateStr, out var d) && d >= monthStart;
+                        })
+                        .Sum(p => decimal.TryParse((p["amountPaid"] ?? p["AmountPaid"] ?? p["amount"])?.ToString(), out var amt) ? amt : 0);
 
                     viewModel.OverduePaymentsCount = payments
                         .Where(p => p["status"]?.ToString() == "Overdue")
