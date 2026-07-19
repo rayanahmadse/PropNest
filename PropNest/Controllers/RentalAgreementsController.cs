@@ -265,5 +265,14 @@ namespace PropNest.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        // Called by JS on Create Agreement page to auto-fill rent fields
+        [HttpGet]
+        public async Task<IActionResult> GetUnitRent(int id)
+        {
+            var unit = await _http.GetFromJsonAsync<PropertyUnit>($"api/PropertyUnits/{id}");
+            if (unit == null) return NotFound();
+            return Json(new { askingRent = unit.AskingRent });
+        }
     }
 }

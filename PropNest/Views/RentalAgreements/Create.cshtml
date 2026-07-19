@@ -80,4 +80,26 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        document.getElementById('UnitID').addEventListener('change', function () {
+            var unitId = this.value;
+            if (!unitId) {
+                document.getElementById('MonthlyRent').value = '';
+                document.getElementById('SecurityDeposit').value = '';
+                return;
+            }
+
+            fetch('/RentalAgreements/GetUnitRent/' + unitId)
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var rent = data.askingRent || 0;
+                    document.getElementById('MonthlyRent').value = rent;
+                    document.getElementById('SecurityDeposit').value = (rent * 2).toFixed(2);
+                })
+                .catch(function () {
+                    // silently fail — user can fill manually
+                });
+        });
+    </script>
 }
